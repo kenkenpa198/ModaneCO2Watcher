@@ -9,6 +9,7 @@ typedef char String[1024];
 int main(void) {
 
     // もだねちゃんの顔を各変数へ格納
+    // エスケープ文字列を一部使っているのでズレに注意
     String modaneTop =     "                          \n"
                            "                ____      \n"
                            "              /      \\   \n"
@@ -20,7 +21,7 @@ int main(void) {
 
     String modaneEye01 =   "       (||   |    |   ||) ";
     String modaneEye02 =   "       (|| -==    ==- ||) ";
-    String modaneEye03 =   "       (||  ★     ★   ||) ";
+    String modaneEye03 =   "       (||  ★     ★   ||) "; // ★を半角で表示するフォントの場合。全角の場合は調整必要
 
     String modaneMouth01 = "        \\) ,,  ー  ,, (ﾉ  ";
     String modaneMouth02 = "        \\) ,,  ワ  ,, (ﾉ  ";
@@ -35,16 +36,17 @@ int main(void) {
     time_t prev, now;
 
     // 乱数用変数の初期化
-    int incNum = 0;
-    int eyeNum = 0;
+    int secCount = 0; // 秒数カウント用
+    int eyeNum   = 0;
     int mouthNum = 0;
 
     // メインのループ処理
-    while(true) {
+    while(1) {
 
         // 現在日時と繰り返し前の値を比較して同じなら処理をコンティニューする
         now = time(NULL);
         if (prev == now) {
+            usleep(2000); // 同じ場合は指定マイクロ秒スリープして次の処理へ
             continue;
         }
         prev = now; // 現在日時を次のループの比較用に格納
@@ -64,8 +66,8 @@ int main(void) {
         // TODO: Windows でも動かせるようにできる？
         system("clear");
 
-        // 乱数確認用
-        printf("incNum   : %d\n", incNum);
+        // 確認用
+        printf("secCount : %d\n", secCount);
         printf("eyeNum   : %d\n", eyeNum);
         printf("mouthNum : %d\n", mouthNum);
 
@@ -115,12 +117,12 @@ int main(void) {
         printf("%s\n",                   modaneBottom);
 
         // 4秒経ったら次のループ用の乱数を生成
-        if (incNum == 3) {
-            incNum   = 0;
+        if (secCount == 3) {
+            secCount = 0;
             eyeNum   = rand()%10;
             mouthNum = rand()%5;
         } else {
-            incNum++; // 次のループ用にインクリメント
+            secCount++;
         }
     }
 
