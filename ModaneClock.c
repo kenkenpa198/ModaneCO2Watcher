@@ -20,6 +20,7 @@ int main(void) {
 
     String modaneEye01 =   "       (||   |    |   ||) ";
     String modaneEye02 =   "       (|| -==    ==- ||) ";
+    String modaneEye03 =   "       (||  ★     ★   ||) ";
 
     String modaneMouth01 = "        \\) ,,  ー  ,, (ﾉ  ";
     String modaneMouth02 = "        \\) ,,  ワ  ,, (ﾉ  ";
@@ -33,7 +34,12 @@ int main(void) {
     char date[64], dow[64], time_[64];
     time_t prev, now;
 
-    // 無限に繰り返し
+    // 乱数用変数の初期化
+    int incNum = 0;
+    int eyeNum = 0;
+    int mouthNum = 0;
+
+    // メインのループ処理
     while(true) {
 
         // 現在日時と繰り返し前の値を比較して同じなら処理をコンティニューする
@@ -41,7 +47,7 @@ int main(void) {
         if (prev == now) {
             continue;
         }
-        prev = now; // 現在日時を次の比較用に格納
+        prev = now; // 現在日時を次のループの比較用に格納
 
         // 日付と曜日の取得
         strftime(date, sizeof(date), "%Y-%m-%d %a.", localtime(&now));
@@ -55,15 +61,16 @@ int main(void) {
         }
 
         // シェルの表示を消去する
-        // TODO: Windows でも動かせるようにする？
+        // TODO: Windows でも動かせるようにできる？
         system("clear");
+
+        // 乱数確認用
+        printf("incNum   : %d\n", incNum);
+        printf("eyeNum   : %d\n", eyeNum);
+        printf("mouthNum : %d\n", mouthNum);
 
         // もだねちゃんと日時を表示
         // TODO: 関数化して一気に表示するようにする
-
-        // 乱数生成
-        int eyeNum = rand()%2;
-        int mouthNum = rand()%2;
 
         // 頭の表示
         printf("%s\n", modaneTop);
@@ -71,19 +78,32 @@ int main(void) {
         // 目と日付の表示
         switch (eyeNum) {
             case 0:
+            case 1:
+            case 2:
+            case 3:
+            case 4:
                 printf("%s   %s\n",              modaneEye01, date);
                 break;
-            case 1:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
                 printf("%s   %s\n",              modaneEye02, date);
+                break;
+            case 9:
+                printf("%s   %s\n",              modaneEye03, date);
                 break;
         }
 
         // 口と区切り線の表示
         switch (mouthNum) {
             case 0:
+            case 1:
+            case 2:
                 printf("%s   ---------------\n", modaneMouth01);
                 break;
-            case 1:
+            case 3:
+            case 4:
                 printf("%s   ---------------\n", modaneMouth02);
                 break;
         }
@@ -93,6 +113,15 @@ int main(void) {
 
         // 首下の表示
         printf("%s\n",                   modaneBottom);
+
+        // 4秒経ったら次のループ用の乱数を生成
+        if (incNum == 3) {
+            incNum   = 0;
+            eyeNum   = rand()%10;
+            mouthNum = rand()%5;
+        } else {
+            incNum++; // 次のループ用にインクリメント
+        }
     }
 
     return 0;
