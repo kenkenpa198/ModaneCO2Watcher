@@ -10,24 +10,24 @@ int main(void) {
 
     // もだねちゃんの顔を各変数へ格納
     // エスケープ文字列を一部使っているのでズレに注意
-    String modaneTop =     "                          \n"
-                           "                ____      \n"
-                           "              /      \\   \n"
-                           "             ( ____   ﾚ-、\n"
-                           "           ／       -ノ_ﾗ \n"
-                           "          \"  人      ヽ  \n"
-                           "        /  ／_ `-_     \\ \n"
-                           "       |  /        `-_  | ";
+    String modaneTop =        "                          \n"
+                              "                ____      \n"
+                              "              /      \\   \n"
+                              "             ( ____   ﾚ-、\n"
+                              "           ／       -ノ_ﾗ \n"
+                              "          \"  人      ヽ  \n"
+                              "        /  ／_ `-_     \\ \n"
+                              "       |  /        `-_  | ";
 
-    String modaneEye01 =   "       (||   |    |   ||) ";
-    String modaneEye02 =   "       (|| -==    ==- ||) ";
-    String modaneEye03 =   "       (||  ★     ★   ||) "; // ★を半角で表示するフォントの場合。全角の場合は調整必要
+    String modaneEyeOpen =    "       (||   |    |   ||) ";
+    String modaneEyeClose =   "       (|| -==    ==- ||) ";
+    String modaneEyeStar =    "       (||  ★     ★   ||) "; // ★を半角で表示するフォントの場合。全角の場合は調整必要
 
-    String modaneMouth01 = "        \\) ,,  ー  ,, (ﾉ  ";
-    String modaneMouth02 = "        \\) ,,  ワ  ,, (ﾉ  ";
+    String modaneMouthClose = "        \\) ,,  ー  ,, (ﾉ  ";
+    String modaneMouthOpen =  "        \\) ,,  ワ  ,, (ﾉ  ";
 
-    String modaneJaw =     "         )ヽ________ノ(   ";
-    String modaneBottom =  "             \\_父_/\n    ";
+    String modaneJaw =        "         )ヽ________ノ(   ";
+    String modaneBottom =     "             \\_父_/\n    ";
 
 
     // 時計の表示処理
@@ -36,7 +36,7 @@ int main(void) {
     time_t prev, now;
 
     // 乱数用変数の初期化
-    int secCount = 0; // 秒数カウント用
+    int secCount = 1; // 秒数カウント用
     int eyeNum   = 0;
     int mouthNum = 0;
 
@@ -67,9 +67,9 @@ int main(void) {
         system("clear");
 
         // 確認用
-        printf("secCount : %d\n", secCount);
-        printf("eyeNum   : %d\n", eyeNum);
-        printf("mouthNum : %d\n", mouthNum);
+        // printf("secCount : %d\n", secCount);
+        // printf("eyeNum   : %d\n", eyeNum);
+        // printf("mouthNum : %d\n", mouthNum);
 
         // もだねちゃんと日時を表示
         // TODO: 関数化して一気に表示するようにする
@@ -79,35 +79,30 @@ int main(void) {
 
         // 目と日付の表示
         switch (eyeNum) {
-            case 0:
             case 1:
             case 2:
             case 3:
             case 4:
-                printf("%s   %s\n",              modaneEye01, date);
+                printf("%s   %s\n",              modaneEyeClose, date);
                 break;
             case 5:
-            case 6:
-            case 7:
-            case 8:
-                printf("%s   %s\n",              modaneEye02, date);
+                printf("%s   %s\n",              modaneEyeStar, date);
                 break;
-            case 9:
-                printf("%s   %s\n",              modaneEye03, date);
-                break;
+            default:
+                // 6 ～ 10 の場合
+                printf("%s   %s\n",              modaneEyeOpen, date);
+
         }
 
         // 口と区切り線の表示
         switch (mouthNum) {
-            case 0:
             case 1:
             case 2:
-                printf("%s   ---------------\n", modaneMouth01);
+                printf("%s   ---------------\n", modaneMouthOpen);
                 break;
-            case 3:
-            case 4:
-                printf("%s   ---------------\n", modaneMouth02);
-                break;
+            default:
+                // 3 ～ 5 の場合
+                printf("%s   ---------------\n", modaneMouthClose);
         }
 
         // アゴと時間の表示
@@ -117,10 +112,10 @@ int main(void) {
         printf("%s\n",                   modaneBottom);
 
         // 4秒経ったら次のループ用の乱数を生成
-        if (secCount == 3) {
-            secCount = 0;
-            eyeNum   = rand()%10;
-            mouthNum = rand()%5;
+        if (secCount == 4) {
+            secCount = 1;
+            eyeNum   = rand()%9 + 1;
+            mouthNum = rand()%4 + 1;
         } else {
             secCount++;
         }
