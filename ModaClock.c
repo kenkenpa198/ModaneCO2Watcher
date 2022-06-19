@@ -61,12 +61,12 @@ int main(void) {
 
 
     ///// curses で描画処理を行う準備 /////
-    int w, h, x, y;        // move() などで指定する座標用変数の宣言
+    int w, h, x, y;          // move() などで指定する座標用変数の宣言
 
-    setlocale(LC_ALL, ""); // 2バイト文字を扱えるようにする
-    initscr();             // cursesを初期化。端末制御の開始
-    noecho();              // キー入力した文字を非表示
-    curs_set(0);           // カーソルを消す
+    setlocale(LC_CTYPE, ""); // 2バイト文字を扱えるようにする
+    initscr();               // cursesを初期化。端末制御の開始
+    noecho();                // キー入力した文字を非表示
+    curs_set(0);             // カーソルを消す
 
 
     ///// 描画ループ処理 /////
@@ -109,7 +109,7 @@ int main(void) {
 
         // 時計を描画
         mvaddstr(y++, x - 10, date);
-        mvaddstr(y++, x - 6, dow);
+        mvaddstr(y++, x - strlen(dow), dow);
         mvaddstr(y++, x - 5, time_);
 
 
