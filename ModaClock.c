@@ -148,7 +148,18 @@ int main(void) {
         ///// 天気の描画処理 /////
         // 基準となる座標の値を格納（シェルの右下）
         y = h - 6;
-        x = w - strlen(wttrLines[0]) + 1 - 2; // + 1 しているのは改行文字分を含めるため
+
+
+        int wttrlen;
+        if (strlen(wttrLines[0]) <= 27) {
+            // 1行目（天気の名前）が2行目（温度の表示）より短かったら2行目の数値を座標の計算に使う
+            // strlen(wttrLines[1])と比較していないのは2行目の右側にスペースが固定で入っているため（除去できそうだったら改善したい）
+            wttrlen = 27;
+        } else {
+            wttrlen = strlen(wttrLines[0]);
+        }
+
+        x = w - wttrlen + 1 - 2; // + 1 しているのは改行文字分を含めるため
 
         // 天気の描画
         for (int i = 0; i < 5; i++) {
