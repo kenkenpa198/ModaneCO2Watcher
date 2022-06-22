@@ -40,7 +40,7 @@ int main(void) {
 
     // 天気取得コマンドを wttrCmd 配列へ格納
     char wttrCmd[512];
-    sprintf(wttrCmd, "curl -s 'wttr.in/%s?0QT'\n", WTTR_LOCALE);
+    sprintf(wttrCmd, "curl -s 'wttr.in/%s?0MQT'\n", WTTR_LOCALE);
 
     // 確認用
     printf("WTTR_LOCALE : %s\n", WTTR_LOCALE);
