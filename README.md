@@ -7,7 +7,13 @@
 
 TODO: 作成する
 
-## 2. 参考サイト
+## 2. コンパイル
+
+```shell
+> gcc ModaClock.c -lncursesw
+```
+
+## 3. 参考サイト
 
 - [C言語ケーススタディ　時計の作り方1](http://www.orchid.co.jp/computer/cschool/clock1.html)
 - [[linux] cursesライブラリのインストール --- undefined reference 'initscr'|Debugging as Usual](http://debuggingasusual.blogspot.com/2011/12/curses.html)
