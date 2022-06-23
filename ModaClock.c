@@ -38,9 +38,12 @@ int main(void) {
         return 1;
     }
 
+    const char* WTTR_OPTION = "0MQT";                // wttr のオプション 
+    const char* WTTR_FORMAT = "&format=%C\\n%t+%p'"; // フォーマット指定
+
     // 天気取得コマンドを wttrCmd 配列へ格納
     char wttrCmd[512];
-    sprintf(wttrCmd, "curl -s 'wttr.in/%s?0MQT'\n", WTTR_LOCALE);
+    sprintf(wttrCmd, "curl -fs 'wttr.in/%s?%s%s", WTTR_LOCALE, WTTR_OPTION, WTTR_FORMAT);
 
     // 確認用
     printf("WTTR_LOCALE : %s\n", WTTR_LOCALE);
@@ -123,8 +126,8 @@ int main(void) {
 
         ///// 時計の描画処理 /////
         // now 変数から日付と曜日を取得する
-        strftime(date, sizeof(date), "%Y-%m-%d", localtime(&now));
-        strftime(dow, sizeof(dow), "%A", localtime(&now));
+        strftime(date, sizeof(date), "%Y-%m-%d %A", localtime(&now));
+        // strftime(dow, sizeof(dow), "%A", localtime(&now));
 
         // now 変数から日付と曜日を取得する
         if (now % 2 == 0) {
@@ -140,30 +143,18 @@ int main(void) {
         x = w - 2;
 
         // 時計を描画
-        mvaddstr(y++, x - 10, date);
-        mvaddstr(y++, x - strlen(dow), dow);
+        mvaddstr(y++, x - strlen(date), date);
         mvaddstr(y++, x - 5, time_);
 
 
         ///// 天気の描画処理 /////
         // 基準となる座標の値を格納（シェルの右下）
-        y = h - 6;
-
-
-        int wttrlen;
-        if (strlen(wttrLines[0]) <= 27) {
-            // 1行目（天気の名前）が2行目（温度の表示）より短かったら2行目の数値を座標の計算に使う
-            // strlen(wttrLines[1])と比較していないのは2行目の右側にスペースが固定で入っているため（除去できそうだったら改善したい）
-            wttrlen = 27;
-        } else {
-            wttrlen = strlen(wttrLines[0]);
-        }
-
-        x = w - wttrlen + 1 - 2; // + 1 しているのは改行文字分を含めるため
+        y++;
+        x = w + 1 - 2; // + 1 しているのは改行文字分を含めるため
 
         // 天気の描画
-        for (int i = 0; i < 5; i++) {
-            mvaddstr(y++, x, wttrLines[i]);
+        for (int i = 0; i < 2; i++) {
+            mvaddstr(y++, x - strlen(wttrLines[i]), wttrLines[i]);
         }
 
         // 乱数と秒カウントの描画（確認用）
@@ -188,7 +179,7 @@ int main(void) {
 
         ///// もだねちゃんの描画処理 /////
         // 基準となる座標の値を格納（シェルの中央左側）
-        y = h / 2 - 6;
+        y = h / 2 - 5;
         x = 2;
 
         // 頭の描画
