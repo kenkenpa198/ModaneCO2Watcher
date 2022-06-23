@@ -87,9 +87,9 @@ int main(void) {
     String ppmGraph02 = " 2000 |                          ";
     String ppmGraph03 = "      |        -''-.             ";
     String ppmGraph04 = " 1000 |   ..--'     '--..        ";
-    String ppmGraph05 = "      | -'               '--  520";
+    String ppmGraph05 = "      |.-'               '-.  220";
     String ppmGraph06 = "    0 +---------------------     ";
-    String ppmGraph07 = "       -20m      -10m     Cur.   ";
+    String ppmGraph07 = "      -20m      -10m      Cur.   ";
 
 
     ///// ループ・描画処理の準備 /////
