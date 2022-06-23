@@ -73,7 +73,7 @@ int main(void) {
 
     String modaneEyeOpen =    "(||   |    |   ||) ";
     String modaneEyeClose =   "(|| -==    ==- ||) ";
-    String modaneEyeStar =    "(||  ★     ★   ||) "; // ★を半角で表示するフォントの場合。全角の場合は★の右側を1つずつ減らす
+    String modaneEyeStar =    "(||  ★    ★  ||) ";
 
     String modaneMouthClose = " \\) ,,  ー  ,, (ﾉ  ";
     String modaneMouthOpen =  " \\) ,,  ワ  ,, (ﾉ  ";
@@ -98,8 +98,8 @@ int main(void) {
     // 秒数カウント・乱数用変数の初期化
     int secCountWttr = 1;    // 天気を再取得する秒数カウント
     int secCountModa = 1;    // もだねちゃんを再描画する秒数カウント
-    int eyeNum       = 0;    // 目の再描画用乱数
-    int mouthNum     = 0;    // 口の再描画用乱数
+    int eyeNum       = 1;    // 目の再描画用乱数
+    int mouthNum     = 1;    // 口の再描画用乱数
 
     // 描画処理の準備
     int w, h, x, y;          // mvaddstr() などで指定する座標用変数の宣言
@@ -206,7 +206,7 @@ int main(void) {
         }
 
         // 口の描画
-        if (eyeNum <= 2) {
+        if (mouthNum == 1) {
             mvaddstr(y++, x, modaneMouthClose);
         } else {
             mvaddstr(y++, x, modaneMouthOpen);
@@ -218,15 +218,15 @@ int main(void) {
 
         // 乱数と秒カウントの描画（確認用）
         // y++;
-        // mvprintw(y++, x, "secCount : %d", secCount);
-        // mvprintw(y++, x, "eyeNum   : %d", eyeNum);
-        // mvprintw(y++, x, "mouthNum : %d", mouthNum);
+        // mvprintw(y++, x, "secCountModa : %d", secCountModa);
+        // mvprintw(y++, x, "eyeNum       : %d", eyeNum);
+        // mvprintw(y++, x, "mouthNum     : %d", mouthNum);
 
         // 4秒経ったら次のループ用の乱数を生成
         if (secCountModa == 4) {
+            eyeNum   = rand()%10 + 1;
+            mouthNum = rand()%2 + 1;
             secCountModa = 1;
-            eyeNum   = rand()%9 + 1;
-            mouthNum = rand()%4 + 1;
         } else {
             secCountModa++;
         }
