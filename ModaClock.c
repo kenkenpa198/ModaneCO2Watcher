@@ -73,7 +73,7 @@ int main(void) {
 
     String modaneEyeOpen =    "(||   |    |   ||) ";
     String modaneEyeClose =   "(|| -==    ==- ||) ";
-    String modaneEyeStar =    "(||  ★    ★  ||) ";
+    String modaneEyeStar =    "(||  ★     ★   ||) "; // ★を半角で表示するフォントの場合。全角の場合は★の右側を1つずつ減らす
 
     String modaneMouthClose = " \\) ,,  ー  ,, (ﾉ  ";
     String modaneMouthOpen =  " \\) ,,  ワ  ,, (ﾉ  ";
