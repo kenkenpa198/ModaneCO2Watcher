@@ -82,9 +82,14 @@ int main(void) {
     String modaneBottom02 =   "      \\_父_/      ";
 
 
-    ///// ラッキーアイテム /////
-    // TODO: 作成する
-    // String luckyItem = "Lucky item : Cat";
+    ///// ppm graph /////
+    String ppmGraph01 = "(ppm)                            ";
+    String ppmGraph02 = " 2000 |                          ";
+    String ppmGraph03 = "      |        -''-.             ";
+    String ppmGraph04 = " 1000 |   ..--'     '--..        ";
+    String ppmGraph05 = "      | -'               '--  520";
+    String ppmGraph06 = "    0 +---------------------     ";
+    String ppmGraph07 = "       -20m      -10m     Cur.   ";
 
 
     ///// ループ・描画処理の準備 /////
@@ -227,14 +232,18 @@ int main(void) {
         }
 
 
-        ///// ラッキーアイテムの描画処理 /////
-        // TODO: 作成する
-        // 基準となる座標の値を格納
-        // y = 5;
-        // x = w - 2;
+        ///// ppm グラフの描画処理 /////
+        // 基準となる座標の値を格納（シェルの右下）
+        y = h - 8;
+        x = w - strlen(ppmGraph01) - 2;
 
-        // // 描画
-        // mvaddstr(y, x - strlen(luckyItem), luckyItem);
+        mvaddstr(y++, x, ppmGraph01);
+        mvaddstr(y++, x, ppmGraph02);
+        mvaddstr(y++, x, ppmGraph03);
+        mvaddstr(y++, x, ppmGraph04);
+        mvaddstr(y++, x, ppmGraph05);
+        mvaddstr(y++, x, ppmGraph06);
+        mvaddstr(y++, x, ppmGraph07);
 
 
         refresh(); // 画面を再描画
