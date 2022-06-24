@@ -1,14 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include <time.h>
 #include <unistd.h>
 
 #include <ncurses.h> // curses ライブラリ
 #include <locale.h>  // curses で2バイト文字を扱えるようにする
-
-typedef char String[1024];
 
 int main(void) {
     ///// タイトル表示 /////
@@ -25,20 +22,18 @@ int main(void) {
 
     ///// 天気の描画処理準備 /////
     // TODO: この辺の処理を関数化する
-    // wttr から天気を取得するコマンドの定義
-
     // 環境変数の読み込み
     const char* WTTR_LOCALE;
     WTTR_LOCALE = getenv("WTTR_LOCALE");
 
+    // 環境変数が読み込めなかったらエラー文を表示して終了
     if (! WTTR_LOCALE) {
-        // 環境変数が読み込めなかったらエラー文を表示して終了
-        printf("The environment variable for displaying weather is not set.\nPlease set \"WTTR_LOCALE\".\n\n");
+        printf("The environment variable for displaying weather is not set.\nPlease set \"WTTR_LOCALE\" to \".bashrc\".\n\n");
         printf("example:\n  $ export WTTR_LOCALE=\"Tokyo\"\n");
         return 1;
     }
 
-    const char* WTTR_OPTION = "0MQT";                // wttr のオプション 
+    const char* WTTR_OPTION = "0MQT";                // wttr のオプション
     const char* WTTR_FORMAT = "&format=%C\\n%t+%p'"; // フォーマット指定
 
     // 天気取得コマンドを wttrCmd 配列へ格納
@@ -60,50 +55,60 @@ int main(void) {
     }
 
 
-    ///// もだねちゃんの AA を格納 /////
+    ///// もだねちゃんの描画処理準備 /////
+    // もだねちゃんの AA を2次元配列へ格納
     // NOTE: エスケープ文字列を一部使っているのでズレに注意
-    // TODO: 配列か構造体にして for 文ループで表示したい
-    String modaneTop01 =      "         ____      ";
-    String modaneTop02 =      "       /      \\    ";
-    String modaneTop03 =      "      ( ____   ﾚ-、";
-    String modaneTop04 =      "    ／       -ノ_ﾗ ";
-    String modaneTop05 =      "   \"  人      ヽ   ";
-    String modaneTop06 =      " /  ／_ `-_     \\  ";
-    String modaneTop07 =      "|  /        `-_  | ";
+    char modaneTops[7][64] = {
+        "         ____      ",
+        "       /      \\    ",
+        "      ( ____   ﾚ-、",
+        "    ／       -ノ_ﾗ ",
+        "   \"  人      ヽ   ",
+        " /  ／_ `-_     \\  ",
+        "|  /        `-_  | "
+    };
 
-    String modaneEyeOpen =    "(||   |    |   ||) ";
-    String modaneEyeClose =   "(|| -==    ==- ||) ";
-    String modaneEyeStar =    "(||  ★     ★   ||) "; // ★を半角で表示するフォントの場合。全角の場合は★の右側を1つずつ減らす
+    char modaneEyes[3][64] = {
+        "(||   |    |   ||) ",  // Open
+        "(|| -==    ==- ||) ",  // Close
+        "(||  ★     ★   ||) " // Star ★を半角で表示するフォントの場合。全角の場合は調整必要
+    };
 
-    String modaneMouthClose = " \\) ,,  ー  ,, (ﾉ  ";
-    String modaneMouthOpen =  " \\) ,,  ワ  ,, (ﾉ  ";
+    char modaneMouths[2][64] = {
+        " \\) ,,  ワ  ,, (ﾉ  ", // Open
+        " \\) ,,  ー  ,, (ﾉ  "  // Close
+    };
 
-    String modaneBottom01 =   "  )ヽ________ノ(   ";
-    String modaneBottom02 =   "      \\_父_/      ";
+    char modaneBottoms[2][64] = {
+        "  )ヽ________ノ(   ",
+        "      \\_父_/      "
+    };
 
 
     ///// ppm graph /////
-    String ppmGraph01 = "(ppm)                            ";
-    String ppmGraph02 = " 2000 |                          ";
-    String ppmGraph03 = "      |        -''-.             ";
-    String ppmGraph04 = " 1000 |   ..--'     '--..        ";
-    String ppmGraph05 = "      |.-'               '-.  220";
-    String ppmGraph06 = "    0 +---------------------     ";
-    String ppmGraph07 = "      -20m      -10m      Cur.   ";
+    char ppmGraphs[7][64] = {
+        "(ppm)                            ",
+        " 2000 |                          ",
+        "      |        -''-.             ",
+        " 1000 |   ..--'     '--..        ",
+        "      |.-'               '-.  220",
+        "    0 +---------------------     ",
+        "      -20m      -10m      Cur.   "
+    };
 
 
-    ///// ループ・描画処理の準備 /////
-    srand((unsigned)time(NULL)); // 乱数用のシードを設定
-
+    ///// ループ処理の準備 /////
     // 秒数カウント・乱数用変数の初期化
-    int secCountWttr = 1;    // 天気を再取得する秒数カウント
-    int secCountModa = 1;    // もだねちゃんを再描画する秒数カウント
-    int eyeNum       = 1;    // 目の再描画用乱数
-    int mouthNum     = 1;    // 口の再描画用乱数
+    srand((unsigned)time(NULL)); // 乱数用のシードを設定
+    int eyeNum       = 1;        // 目の再描画用乱数
+    int mouthNum     = 1;        // 口の再描画用乱数
+    int secCountWttr = 1;        // 天気を再取得する秒数カウント
+    int secCountModa = 1;        // もだねちゃんを再描画する秒数カウント
 
-    // 描画処理の準備
-    int w, h, x, y;          // mvaddstr() などで指定する座標用変数の宣言
-    setlocale(LC_CTYPE, ""); // 2バイト文字を扱えるようにする
+
+    ///// 描画処理の準備 /////
+    int w, h, x, y;              // mvaddstr() などで指定する座標用変数の宣言
+    setlocale(LC_CTYPE, "");     // 2バイト文字を扱えるようにする
 
 
     ///// 端末制御の開始 /////
@@ -134,7 +139,7 @@ int main(void) {
         strftime(date, sizeof(date), "%Y-%m-%d %A", localtime(&now));
         // strftime(dow, sizeof(dow), "%A", localtime(&now));
 
-        // now 変数から日付と曜日を取得する
+        // now 変数から時間を取得する
         if (now % 2 == 0) {
             // 偶数の場合はコロンあり
             strftime(time_, sizeof(time_), "%H:%M", localtime(&now));
@@ -188,33 +193,30 @@ int main(void) {
         x = 2;
 
         // 頭の描画
-        mvaddstr(y++, x, modaneTop01);
-        mvaddstr(y++, x, modaneTop02);
-        mvaddstr(y++, x, modaneTop03);
-        mvaddstr(y++, x, modaneTop04);
-        mvaddstr(y++, x, modaneTop05);
-        mvaddstr(y++, x, modaneTop06);
-        mvaddstr(y++, x, modaneTop07);
+        for (int i = 0; i < 7; i++) {
+            mvaddstr(y++, x, modaneTops[i]);
+        }
 
         // 目の描画
         if (eyeNum <= 6) {
-            mvaddstr(y++, x, modaneEyeOpen);
+            mvaddstr(y++, x, modaneEyes[0]); // Open
         } else if (eyeNum <= 9) {
-            mvaddstr(y++, x, modaneEyeClose);
+            mvaddstr(y++, x, modaneEyes[1]); // Close
         } else {
-            mvaddstr(y++, x, modaneEyeStar);
+            mvaddstr(y++, x, modaneEyes[2]); // Star
         }
 
         // 口の描画
         if (mouthNum == 1) {
-            mvaddstr(y++, x, modaneMouthClose);
+            mvaddstr(y++, x, modaneMouths[0]); // Open
         } else {
-            mvaddstr(y++, x, modaneMouthOpen);
+            mvaddstr(y++, x, modaneMouths[1]); // Close
         }
 
         // 首元の描画
-        mvaddstr(y++, x, modaneBottom01);
-        mvaddstr(y++, x, modaneBottom02);
+        for (int i = 0; i < 2; i++) {
+            mvaddstr(y++, x, modaneBottoms[i]);
+        }
 
         // 乱数と秒カウントの描画（確認用）
         // y++;
@@ -235,15 +237,11 @@ int main(void) {
         ///// ppm グラフの描画処理 /////
         // 基準となる座標の値を格納（シェルの右下）
         y = h - 8;
-        x = w - strlen(ppmGraph01) - 2;
+        x = w - strlen(ppmGraphs[0]) - 2;
 
-        mvaddstr(y++, x, ppmGraph01);
-        mvaddstr(y++, x, ppmGraph02);
-        mvaddstr(y++, x, ppmGraph03);
-        mvaddstr(y++, x, ppmGraph04);
-        mvaddstr(y++, x, ppmGraph05);
-        mvaddstr(y++, x, ppmGraph06);
-        mvaddstr(y++, x, ppmGraph07);
+        for (int i = 0; i < 7; i++) {
+            mvaddstr(y++, x, ppmGraphs[i]);
+        }
 
 
         refresh(); // 画面を再描画
