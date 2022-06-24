@@ -40,7 +40,7 @@ int main(void) {
     char wttrCmd[512];
     sprintf(wttrCmd, "curl -fs 'wttr.in/%s?%s%s", WTTR_LOCALE, WTTR_OPTION, WTTR_FORMAT);
 
-    // 確認用
+    // 読み込めた環境変数と天気取得コマンドを表示
     printf("WTTR_LOCALE : %s\n", WTTR_LOCALE);
     printf("wttrCmd     : %s\n", wttrCmd);
 
@@ -58,7 +58,7 @@ int main(void) {
     ///// もだねちゃんの描画処理準備 /////
     // もだねちゃんの AA を2次元配列へ格納
     // NOTE: エスケープ文字列を一部使っているのでズレに注意
-    char modaneTops[7][64] = {
+    char modaneTopLines[7][64] = {
         "         ____      ",
         "       /      \\    ",
         "      ( ____   ﾚ-、",
@@ -68,18 +68,18 @@ int main(void) {
         "|  /        `-_  | "
     };
 
-    char modaneEyes[3][64] = {
+    char modaneEyeLines[3][64] = {
         "(||   |    |   ||) ",  // Open
         "(|| -==    ==- ||) ",  // Close
         "(||  ★     ★   ||) " // Star ★を半角で表示するフォントの場合。全角の場合は調整必要
     };
 
-    char modaneMouths[2][64] = {
+    char modaneMouthLines[2][64] = {
         " \\) ,,  ワ  ,, (ﾉ  ", // Open
         " \\) ,,  ー  ,, (ﾉ  "  // Close
     };
 
-    char modaneBottoms[2][64] = {
+    char modaneBottomLines[2][64] = {
         "  )ヽ________ノ(   ",
         "      \\_父_/      "
     };
@@ -194,28 +194,28 @@ int main(void) {
 
         // 頭の描画
         for (int i = 0; i < 7; i++) {
-            mvaddstr(y++, x, modaneTops[i]);
+            mvaddstr(y++, x, modaneTopLines[i]);
         }
 
         // 目の描画
         if (eyeNum <= 6) {
-            mvaddstr(y++, x, modaneEyes[0]); // Open
+            mvaddstr(y++, x, modaneEyeLines[0]); // Open
         } else if (eyeNum <= 9) {
-            mvaddstr(y++, x, modaneEyes[1]); // Close
+            mvaddstr(y++, x, modaneEyeLines[1]); // Close
         } else {
-            mvaddstr(y++, x, modaneEyes[2]); // Star
+            mvaddstr(y++, x, modaneEyeLines[2]); // Star
         }
 
         // 口の描画
         if (mouthNum == 1) {
-            mvaddstr(y++, x, modaneMouths[0]); // Open
+            mvaddstr(y++, x, modaneMouthLines[0]); // Open
         } else {
-            mvaddstr(y++, x, modaneMouths[1]); // Close
+            mvaddstr(y++, x, modaneMouthLines[1]); // Close
         }
 
         // 首元の描画
         for (int i = 0; i < 2; i++) {
-            mvaddstr(y++, x, modaneBottoms[i]);
+            mvaddstr(y++, x, modaneBottomLines[i]);
         }
 
         // 乱数と秒カウントの描画（確認用）
