@@ -18,7 +18,7 @@ int main(void) {
 
     ////////// 時計の描画処理準備 //////////
     // 時計の表示用変数を宣言
-    char date[64], dow[64], time_[64];
+    char datetime[64];
     time_t prev, now;
 
 
@@ -208,31 +208,25 @@ int main(void) {
 
 
         ////////// 時計の描画処理 //////////
-        // now 変数から日付と曜日を取得する
-        strftime(date, sizeof(date), "%Y-%m-%d %A", localtime(&now));
-        // strftime(dow, sizeof(dow), "%A", localtime(&now));
-
-        // now 変数から時間を取得する
+        // now を日付時間と曜日へ変換
         if (now % 2 == 0) {
             // 偶数の場合はコロンあり
-            strftime(time_, sizeof(time_), "%H:%M", localtime(&now));
+            strftime(datetime, sizeof(datetime), "%Y-%m-%d (%a) %H:%M", localtime(&now));
         } else {
             // 奇数の場合はコロンなし
-            strftime(time_, sizeof(time_), "%H %M", localtime(&now));
+            strftime(datetime, sizeof(datetime), "%Y-%m-%d (%a) %H %M", localtime(&now));
         }
 
-        // 基準となる座標の値を格納（シェルの右上）
+        // 基準座標の変数を初期化（シェルの右上）
         y = 1;
         x = w - 2;
 
         // 時計を描画
-        mvaddstr(y++, x - strlen(date), date);
-        mvaddstr(y++, x - 5, time_);
+        mvaddstr(y++, x - strlen(datetime), datetime);
 
 
         ////////// 天気の描画処理 //////////
-        // 基準となる座標の値を格納（時計描画の2行下）
-        y++;
+        // 基準座標の変数を初期化（時計描画の1行下のため y の初期化は無し）
         x = w + 1 - 2; // + 1 しているのは改行文字分を含めるため
 
         // 天気の描画
@@ -260,7 +254,7 @@ int main(void) {
 
 
         ////////// もだねちゃんの描画処理 //////////
-        // 基準となる座標の値を格納（シェルの中央左側）
+        // 基準座標の変数を初期化（シェルの中央左側）
         y = h / 2 - 5;
         x = 2;
 
@@ -307,7 +301,7 @@ int main(void) {
 
 
         ////////// CO2 グラフ（ベース）の描画処理 //////////
-        // 基準となる座標の値を格納（シェルの右下）
+        // 基準座標の変数を初期化（シェルの右下）
         y = h - 8;
         x = w - strlen(co2GraphBaseLines[0]) - 2;
 
@@ -320,7 +314,7 @@ int main(void) {
         ////////// CO2 グラフ（グラフ部分）の描画処理 //////////
         // TODO: 1分毎に濃度配列を更新する
 
-        // 基準となる座標の値を格納（シェルの右下のグラフベース内）
+        // 基準座標の変数を初期化（シェルの右下のグラフベース内）
         y = h - 4;
         x = w - 26 - 2;
 
