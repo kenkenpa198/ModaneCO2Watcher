@@ -355,6 +355,14 @@ int main(void) {
             x++;
         }
 
+        // 1秒ごとに現在のグラフ線部分にスペースを上書きして点滅させる
+        if (now % 2 == 0) {
+            mvaddstr(y    , x - 1, " ");
+            mvaddstr(y - 1, x - 1, " ");
+            mvaddstr(y - 2, x - 1, " ");
+            mvaddstr(y - 3, x - 1, " ");
+        }
+
         // CO2 濃度配列の現在の数値を描画
         x++;
 
