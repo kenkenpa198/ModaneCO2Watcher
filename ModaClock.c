@@ -356,7 +356,7 @@ int main(void) {
         }
 
         // 1秒ごとに現在のグラフ線部分にスペースを上書きして点滅させる
-        if (now % 2 == 0) {
+        if (now % 2 != 0) {
             mvaddstr(y    , x - 1, " ");
             mvaddstr(y - 1, x - 1, " ");
             mvaddstr(y - 2, x - 1, " ");
