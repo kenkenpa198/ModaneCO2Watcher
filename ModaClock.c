@@ -87,6 +87,10 @@ int main(void) {
         "      \\_父_/      "
     };
 
+    // 目と口を出し分けするための乱数用変数を初期化
+    int eyeNum       = 1;
+    int mouthNum     = 1;
+
 
     ////////// CO2 グラフの描画処理準備 //////////
     // グラフのベースの2次元配列
@@ -171,13 +175,6 @@ int main(void) {
     printf("\n");
 
 
-    ////////// ループ処理用カウント・乱数用変数の初期化 //////////
-    int eyeNum       = 1;        // 目の再描画用乱数
-    int mouthNum     = 1;        // 口の再描画用乱数
-    int secCountWttr = 1;        // 天気を再取得する秒数カウント
-    int secCountModa = 1;        // もだねちゃんを再描画する秒数カウント
-
-
     ////////// 描画処理の準備 //////////
     int w, h, x, y;              // mvaddstr() などで指定する座標用変数の宣言
     setlocale(LC_CTYPE, "");     // 2バイト文字を扱えるようにする
@@ -210,11 +207,11 @@ int main(void) {
         ////////// 時計の描画処理 //////////
         // now を日付時間と曜日へ変換
         if (now % 2 == 0) {
-            // 偶数の場合はコロンあり
-            strftime(datetime, sizeof(datetime), "%Y-%m-%d (%a) %H:%M", localtime(&now));
-        } else {
-            // 奇数の場合はコロンなし
+            // 偶数の場合はコロンなし
             strftime(datetime, sizeof(datetime), "%Y-%m-%d (%a) %H %M", localtime(&now));
+        } else {
+            // 奇数の場合はコロンあり
+            strftime(datetime, sizeof(datetime), "%Y-%m-%d (%a) %H:%M", localtime(&now));
         }
 
         // 基準座標の変数を初期化（シェルの右上）
@@ -238,18 +235,14 @@ int main(void) {
         // y++;
         // mvprintw(y++, x, "secCountWttr : %d", secCountWttr);
 
-        // 指定時間秒経ったら天気取得コマンドを再実行して fp を更新する
-        if (secCountWttr == 60 * 30) {
-            // TODO: 関数化する
-            // TODO: スレッド処理にして更新時のラグを無くす
-
+        // 30分毎に天気取得コマンドを再実行して fp を更新する
+        // TODO: 関数化する
+        // TODO: スレッド処理にして更新時のラグを無くす
+        if (now % (60 * 30) == 0) {
             fp = popen(wttrCmd, "r");
             for (int i = 0; i < 5; i++) {
                 fgets(wttrLines[i], sizeof(wttrLines[i]), fp) != NULL;
             }
-            secCountWttr = 1; // カウントのリセット
-        } else {
-            secCountWttr++;
         }
 
 
@@ -290,13 +283,10 @@ int main(void) {
         // mvprintw(y++, x, "eyeNum       : %d", eyeNum);
         // mvprintw(y++, x, "mouthNum     : %d", mouthNum);
 
-        // 4秒経ったら次のループ用の乱数を生成
-        if (secCountModa == 4) {
+        // 4秒毎に次のループ用の乱数を生成
+        if (now % 4 == 0) {
             eyeNum   = rand() % 10 + 1;
             mouthNum = rand() % 2 + 1;
-            secCountModa = 1;
-        } else {
-            secCountModa++;
         }
 
 
@@ -349,8 +339,8 @@ int main(void) {
             x++;
         }
 
-        // 1秒ごとに現在のグラフ線部分にスペースを上書きして点滅させる
-        if (now % 2 != 0) {
+        // 1秒毎に現在のグラフ線部分にスペースを上書きして点滅させる
+        if (now % 2 == 0) {
             mvaddstr(y    , x - 1, " ");
             mvaddstr(y - 1, x - 1, " ");
             mvaddstr(y - 2, x - 1, " ");
