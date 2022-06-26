@@ -24,15 +24,17 @@ int main(void) {
 
     ////////// 天気の描画処理準備 //////////
     // TODO: この辺の処理を関数化する
-    // 環境変数の読み込み
-    const char* WTTR_LOCALE;
-    WTTR_LOCALE = getenv("WTTR_LOCALE");
+    // 取得するロケールを初期化
+    const char* WTTR_LOCALE = "Tokyo";
 
-    // 環境変数が読み込めなかったらエラー文を表示して終了
-    if (! WTTR_LOCALE) {
-        printf("The environment variable for displaying weather is not set.\nPlease set \"WTTR_LOCALE\" to \".bashrc\".\n\n");
-        printf("example:\n  $ export WTTR_LOCALE=\"Tokyo\"\n");
-        return 1;
+    // 環境変数に WTTR_LOCALE が設定してあればその値を読み込む
+    if (getenv("WTTR_LOCALE")) {
+        WTTR_LOCALE = getenv("WTTR_LOCALE");
+        printf("天気表示用の環境変数を読み込みました。\n");
+    } else {
+        printf("天気表示用の環境変数が読み込めなかったため、デフォルト設定を使用します。\n");
+        printf("好きな場所の天気予報を表示したい場合、WTTR_LOCALE 環境変数を設定してください。\n");
+        printf("example     : $ export WTTR_LOCALE=\"Tokyo\"\n\n");
     }
 
     const char* WTTR_OPTION = "0MQT";                // wttr のオプション
@@ -152,9 +154,6 @@ int main(void) {
             }
         }
     }
-    for(i=0; i < sizeof(co2Values)/sizeof(co2Values[0]); i++) {
-        printf("%d\n", co2Values[i]);
-    }
 
     // 境界値配列の初期化
     // 下限値値（250）+ 2000 / 12 の値を切り捨てた値（167）* 繰り返し回数（i）で境界値を計算
@@ -165,24 +164,29 @@ int main(void) {
     }
 
     // 確認用
-    for (int i = 0; i < 22; i++) {
+    for (int i = 0; i < 21; i++) {
         printf("co2Values %2d : %4d\n", i, co2Values[i]);
     }
-    printf("\n");
-    for (int i = 0; i < 11; i++) {
-        printf("co2BoundaryValue %2d : %4d\n", i, co2BoundaryValue[i]);
-    }
+    // printf("\n");
+    // for (int i = 0; i < 11; i++) {
+    //     printf("co2BoundaryValue %2d : %4d\n", i, co2BoundaryValue[i]);
+    // }
     printf("\n");
 
 
     ////////// 描画処理の準備 //////////
-    int w, h, x, y;              // mvaddstr() などで指定する座標用変数の宣言
-    setlocale(LC_CTYPE, "");     // 2バイト文字を扱えるようにする
+    int w, h;                // 描画する画面の幅・高さ
+    int x, y;                // mvaddstr() などで指定する縦横軸の座標
+    int	key;                 // 送信されたキー入力の番号を格納する変数。getch() の戻り値は int のため int 型で宣言
+    setlocale(LC_CTYPE, ""); // 2バイト文字を扱えるようにする
 
 
     ////////// 端末制御の開始 //////////
+    printf("描画を開始します。\n終了するには Q キーを押してください。\n");
+    sleep(3);                // 設定内容表示のため一旦待機
     initscr();               // cursesを初期化。端末制御の開始
     noecho();                // キー入力した文字を非表示
+    timeout(0);              // キー入力を待たない
     curs_set(0);             // カーソルを消す
 
     // 以降はループ処理で毎秒画面を更新して描画を行う
@@ -361,7 +365,18 @@ int main(void) {
         }
 
         refresh(); // 画面を再描画
+
+
+        // ////////// キー入力の受付処理 //////////
+        key = getch();
+
+        // Q キーだったらループを抜ける
+        if (key == 'q') {
+            break;
+        }
+
     }
 
+    endwin(); // 端末制御の終了
     return 0;
 }
