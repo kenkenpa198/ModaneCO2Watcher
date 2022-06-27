@@ -414,7 +414,7 @@ int main(void) {
         printCo2LineGraph(h - 4, w - 28, co2Values);
 
         // CO2 濃度配列の現在の数値を描画
-        printCo2ValueNow(h - 4, w - 5, co2Values[20]);
+        printCo2ValueNow(h - 4, w - 6, co2Values[20]);
 
         // 1秒毎に現在のグラフ線部分にスペースを上書きして点滅させる
         doBlinkCo2Graph(h - 4, w - 7, now);
