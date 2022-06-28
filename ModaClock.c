@@ -279,24 +279,6 @@ int main(void) {
     printf("------------------------------------------\n");
 
 
-    ////////// 天気の描画処理準備 //////////
-    // wttr コマンドの作成
-    char wttrCmd[512];
-    makeWttrCmd(wttrCmd);
-    printf("wttrCmd     : %s\n\n", wttrCmd);
-
-    // 天気取得コマンドの初回実行
-    char wttrLines[2][512];
-    getWttrLines(wttrCmd, wttrLines);
-    printf("wttrLines :\n%s%s\n\n", wttrLines[0], wttrLines[1]);
-
-
-    ////////// もだねちゃんの描画処理準備 //////////
-    // 目と口を出し分けするための乱数用変数を初期化
-    int eyeNum       = 1;
-    int mouthNum     = 1;
-
-
     ////////// CO2 グラフの描画処理準備 //////////
     // TODO: 別ファイルから濃度の値を取得する関数をこの辺で実行。時系列の昇順で格納する（1番目が21分前、20番目が1分前、21番目が現在）
     // CO2 濃度配列の初期化
@@ -350,6 +332,24 @@ int main(void) {
         printf("co2Values %2d : %4d\n", i, co2Values[i]);
     }
     printf("\n");
+
+
+    ////////// 天気の描画処理準備 //////////
+    // wttr コマンドの作成
+    char wttrCmd[512];
+    makeWttrCmd(wttrCmd);
+    printf("wttrCmd     : %s\n\n", wttrCmd);
+
+    // 天気取得コマンドの初回実行
+    char wttrLines[2][512];
+    getWttrLines(wttrCmd, wttrLines);
+    printf("wttrLines :\n%s%s\n\n", wttrLines[0], wttrLines[1]);
+
+
+    ////////// もだねちゃんの描画処理準備 //////////
+    // 目と口を出し分けするための乱数用変数を初期化
+    int eyeNum       = 1;
+    int mouthNum     = 1;
 
 
     ////////// 描画処理の準備 //////////
