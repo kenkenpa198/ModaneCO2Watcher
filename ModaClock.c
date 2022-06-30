@@ -62,7 +62,7 @@ CO2 濃度の配列を作成する関数
 戻り値 : CO2 濃度の配列
 
 ***************************************/
-void assignCo2Conces(int co2Conces[21]) {
+void getAndAssignCo2Conces(int co2Conces[21]) {
     // TODO: CSV ファイルを読み込む
     // TODO: 引数分だけ最終行から行を遡ってその値を取得する
     // TODO: 遡る先の行が存在しなかった場合は NULL を返す
@@ -70,7 +70,7 @@ void assignCo2Conces(int co2Conces[21]) {
     int n = 0;
     for (int i = 0; i < 21; i++) {
         co2Conces[i] = getCo2ConceFromLogs(n);
-        n += 6; // TODO: 10 * ○分毎の指定
+        n += 6; // TODO: 10 * ○分毎の指定。10分毎に記録するので、6 で指定すると6行分ずつ遡って格納する 
     }
 
     return;
@@ -357,7 +357,7 @@ int main(void) {
     // ログファイルから過去の CO2 濃度を取得して配列へ格納
     srand((unsigned)time(NULL)); // TODO: 処理が完成したら消す
     int co2Conces[21] = {0};
-    assignCo2Conces(co2Conces);
+    getAndAssignCo2Conces(co2Conces);
 
     // TODO: 作成終わったら消す
     int i, j, tmp;
@@ -452,7 +452,7 @@ int main(void) {
         // TODO: 10分毎に CO2 濃度の記録と配列の再代入を行う
         if (now % (60 * 10) == 0) {
             doRecordCo2ConceToLogs();
-            assignCo2Conces(co2Conces);
+            getAndAssignCo2Conces(co2Conces);
 
             // TODO: 作成終わったら消す
             int i, j, tmp;
