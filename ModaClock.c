@@ -9,13 +9,82 @@
 
 
 /***************************************
+CO2 濃度をログへ書き込む関数
+
+記録用 Python ファイルを実行する関数。
+Python ファイル内部で CO2 濃度を測定とログ用 CSV への書き込み処理を行う。
+
+引数   : なし
+戻り値 : なし
+
+// TODO: 下記を検証する
+- python ファイルが存在しなかった場合
+- python ファイルが権限エラーなどで実行できなかった場合
+- python ファイルの実行中に何らかのエラーが起こった場合
+- python ファイルの中で呼び出している mh_z19 のセンサーが起動していなかった場合
+
+***************************************/
+void doRecordCo2ConceToLogs(void) {
+    system("python3 record_co2_conce.py");
+    return;
+}
+
+/***************************************
+CO2 濃度をログから取得する関数
+
+CO2 濃度のログファイル最終行（最新）から CO2 濃度を取得して返却する。
+引数で指定された数値分、行を巻き戻る。
+
+引数   : 最終行から遡る行数
+戻り値 : 遡った先に行が存在した場合 → CO2 濃度の数値
+         存在しなかった場合         → NULL
+
+***************************************/
+int getCo2ConceFromLogs(int returnRowCount) {
+    // TODO: CSV ファイルを読み込む
+    // TODO: 引数分だけ最終行から行を遡ってその値を取得する
+    // TODO: 遡る先の行が存在しなかった場合は NULL を返す
+
+    // 作成用
+
+    int co2Conce = rand() % 1600 + 1;
+
+    return co2Conce;
+}
+
+/***************************************
+CO2 濃度の配列を作成する関数
+
+「CO2 濃度をログから取得する関数」をループ処理し、
+○分毎の濃度を配列として格納する。
+
+引数   : CO2 濃度の配列？
+戻り値 : CO2 濃度の配列
+
+***************************************/
+void assignCo2Conces(int co2Conces[21]) {
+    // TODO: CSV ファイルを読み込む
+    // TODO: 引数分だけ最終行から行を遡ってその値を取得する
+    // TODO: 遡る先の行が存在しなかった場合は NULL を返す
+
+    int n = 0;
+    for (int i = 0; i < 21; i++) {
+        co2Conces[i] = getCo2ConceFromLogs(n);
+        n += 6; // TODO: 10 * ○分毎の指定
+    }
+
+    return;
+}
+
+
+/***************************************
 天気取得コマンドを作成する関数
 
 引数   : コマンドを格納する既定の配列
 戻り値 : なし（既定の配列を書き換えるため）
 
 ***************************************/
-void makeWttrCmd (char wttrCmd[512]) {
+void makeWttrCmd(char wttrCmd[512]) {
     // 取得するロケールを初期化
     const char* WTTR_LOCALE = "Tokyo";
 
@@ -46,7 +115,7 @@ void makeWttrCmd (char wttrCmd[512]) {
 戻り値 : なし（既定の配列を書き換えるため）
 
 ***************************************/
-void getWttrLines (char wttrCmd[512], char wttrLines[2][512]) {
+void getWttrLines(char wttrCmd[512], char wttrLines[2][512]) {
     // 天気の格納用配列を宣言
     FILE * fp = NULL;
 
@@ -131,7 +200,7 @@ void printCo2GraphBase(int y, int x) {
 戻り値 : なし
 
 ***************************************/
-void printCo2LineGraph(int y, int x, int co2Values[11]) {
+void printCo2LineGraph(int y, int x, int co2Conces[11]) {
     // 境界値配列の初期化
     // 下限値値（250）+ 2000 / 12 の値を切り捨てた値（167）* 繰り返し回数（i）で境界値を計算
     // NOTE: 切り捨て時の端数を考慮していないため、少しずつ境界値が本来の境界値よりズレていく
@@ -141,28 +210,29 @@ void printCo2LineGraph(int y, int x, int co2Values[11]) {
     }
 
     // 折れ線グラフの描画
+    // TODO: もっと綺麗に書く
     for (int i = 0; i < 21; i++) {
-        if (co2Values[i] < co2BoundaryValue[0]) {
+        if (co2Conces[i] < co2BoundaryValue[0]) {
             mvaddstr(y, x, "_");
-        } else if (co2Values[i] < co2BoundaryValue[1]) {
+        } else if (co2Conces[i] < co2BoundaryValue[1]) {
             mvaddstr(y, x, "-");
-        } else if (co2Values[i] < co2BoundaryValue[2]) {
+        } else if (co2Conces[i] < co2BoundaryValue[2]) {
             mvaddstr(y, x, "`");
-        } else if (co2Values[i] < co2BoundaryValue[3]) {
+        } else if (co2Conces[i] < co2BoundaryValue[3]) {
             mvaddstr(y - 1, x, "_");
-        } else if (co2Values[i] < co2BoundaryValue[4]) {
+        } else if (co2Conces[i] < co2BoundaryValue[4]) {
             mvaddstr(y - 1, x, "-");
-        } else if (co2Values[i] < co2BoundaryValue[5]) {
+        } else if (co2Conces[i] < co2BoundaryValue[5]) {
             mvaddstr(y - 1, x, "`");
-        } else if (co2Values[i] < co2BoundaryValue[6]) {
+        } else if (co2Conces[i] < co2BoundaryValue[6]) {
             mvaddstr(y - 2, x, "_");
-        } else if (co2Values[i] < co2BoundaryValue[7]) {
+        } else if (co2Conces[i] < co2BoundaryValue[7]) {
             mvaddstr(y - 2, x, "-");
-        } else if (co2Values[i] < co2BoundaryValue[8]) {
+        } else if (co2Conces[i] < co2BoundaryValue[8]) {
             mvaddstr(y - 2, x, "`");
-        } else if (co2Values[i] < co2BoundaryValue[9]) {
+        } else if (co2Conces[i] < co2BoundaryValue[9]) {
             mvaddstr(y - 3, x, "_");
-        } else if (co2Values[i] < co2BoundaryValue[10]) {
+        } else if (co2Conces[i] < co2BoundaryValue[10]) {
             mvaddstr(y - 3, x, "-");
         } else {
             mvaddstr(y - 3, x, "`");
@@ -283,55 +353,27 @@ int main(void) {
 
     ////////// CO2 グラフの描画処理準備 //////////
     // TODO: 別ファイルから濃度の値を取得する関数をこの辺で実行。時系列の昇順で格納する（1番目が21分前、20番目が1分前、21番目が現在）
-    // CO2 濃度配列の初期化
-    // int co2Values[21] = {0};
 
-    // 確認用（直接指定）
-    // int co2Values[21] = {
-    //     0,
-    //     100,
-    //     200,
-    //     300,
-    //     400,
-    //     500,
-    //     600,
-    //     700,
-    //     800,
-    //     900,
-    //     1000,
-    //     1100,
-    //     1200,
-    //     1300,
-    //     1400,
-    //     1500,
-    //     1600,
-    //     1700,
-    //     1800,
-    //     1900,
-    //     2000
-    // };
+    // ログファイルから過去の CO2 濃度を取得して配列へ格納
+    srand((unsigned)time(NULL)); // TODO: 処理が完成したら消す
+    int co2Conces[21] = {0};
+    assignCo2Conces(co2Conces);
 
-    // 確認用（ランダム値）
-    // ランダム値を生成後に昇順で並び替え（https://programminglang.com/ja/sort-array-in-descending-order-ja/）
-    int co2Values[21];
-    for (int i = 0; i < 22; i++) {
-        int n = rand() % 2300 + 1;
-        co2Values[i] = n;
-    }
+    // TODO: 作成終わったら消す
     int i, j, tmp;
-    for (i=0; i<sizeof(co2Values)/sizeof(co2Values[0]); i++) {
-        for(j=i+1; j<sizeof(co2Values)/sizeof(co2Values[0]); j++) {
-            if(co2Values[j] < co2Values[i]) {
-                tmp = co2Values[i];
-                co2Values[i] = co2Values[j];
-                co2Values[j] = tmp;
+    for (i=0; i<sizeof(co2Conces)/sizeof(co2Conces[0]); i++) {
+        for(j=i+1; j<sizeof(co2Conces)/sizeof(co2Conces[0]); j++) {
+            if(co2Conces[j] < co2Conces[i]) {
+                tmp = co2Conces[i];
+                co2Conces[i] = co2Conces[j];
+                co2Conces[j] = tmp;
             }
         }
     }
 
     // 取得したCO2配列の確認
     for (int i = 0; i < 21; i++) {
-        printf("co2Values %2d : %4d\n", i, co2Values[i]);
+        printf("co2Conces %2d : %4d\n", i, co2Conces[i]);
     }
     printf("\n");
 
@@ -407,16 +449,33 @@ int main(void) {
 
 
         ////////// CO2 グラフの描画処理 //////////
-        // TODO: 1分毎に濃度配列を更新する
+        // TODO: 10分毎に CO2 濃度の記録と配列の再代入を行う
+        if (now % (60 * 10) == 0) {
+            doRecordCo2ConceToLogs();
+            assignCo2Conces(co2Conces);
+
+            // TODO: 作成終わったら消す
+            int i, j, tmp;
+            for (i=0; i<sizeof(co2Conces)/sizeof(co2Conces[0]); i++) {
+                for(j=i+1; j<sizeof(co2Conces)/sizeof(co2Conces[0]); j++) {
+                    if(co2Conces[j] < co2Conces[i]) {
+                        tmp = co2Conces[i];
+                        co2Conces[i] = co2Conces[j];
+                        co2Conces[j] = tmp;
+                    }
+                }
+            }
+        }
+
 
         // グラフのベースを描画
         printCo2GraphBase(h - 8, w - 35);
 
         // CO2 濃度配列を折れ線グラフで描画
-        printCo2LineGraph(h - 4, w - 28, co2Values);
+        printCo2LineGraph(h - 4, w - 28, co2Conces);
 
         // CO2 濃度配列の現在の数値を描画
-        printCo2ValueNow(h - 4, w - 6, co2Values[20]);
+        printCo2ValueNow(h - 4, w - 6, co2Conces[20]);
 
         // 1秒毎に現在のグラフ線部分にスペースを上書きして点滅させる
         doBlinkCo2Graph(h - 4, w - 7, now);
