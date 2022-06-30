@@ -56,6 +56,8 @@ void getWttrLines (char wttrCmd[512], char wttrLines[2][512]) {
         fgets(wttrLines[i], sizeof(wttrLines[i]), fp) != NULL; // 1行ごとに配列へ格納
     }
 
+    pclose(fp);
+
     return;
 }
 
