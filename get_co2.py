@@ -1,5 +1,7 @@
 import csv
 from datetime import datetime as dt
+import os
+
 # import mh_z19
 
 # 現在日時を取得（YYYY-MM-DD hh:mm:ss）
@@ -11,7 +13,12 @@ print(now)
 co2_conce = 111
 print(co2_conce)
 
+# logs ディレクトリが無ければ作成
+dir_path = './logs/'
+os.makedirs(dir_path, exist_ok=True) 
+
 # CSV ファイルへ書き込み
-with open('./logs/co2_conces.csv', 'a') as f:
+filename = 'co2_conces.csv'
+with open(dir_path + filename, 'a') as f:
     writer = csv.writer(f)
     writer.writerow([now, co2_conce])
