@@ -87,10 +87,6 @@ void getCo2ConcesFromLogs(int co2Conces[21]) {
     }
     fclose(fp);
 
-    for (int i = 0; i <lineCount; i++) {
-        printf("%d\n", co2ConcesHeap[i]);
-    }
-
     // ヒープ配列の最終要素から6個毎（1時間毎）に CO2 配列の最終要素から順に再代入する
     int c = lineCount - 1; // lineCount を添え字に合わせる
     for (int i = 20; i >= 0 && c >= 0; i--) {
