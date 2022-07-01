@@ -262,7 +262,9 @@ void printCo2LineGraph(int y, int x, int co2Conces[21]) {
     // 折れ線グラフの描画
     // TODO: もっと綺麗に書く
     for (int i = 0; i < 21; i++) {
-        if (co2Conces[i] < co2BoundaryValue[0]) {
+        if (co2Conces[i] <= 0) {
+            mvaddstr(y, x, " ");
+        } else if (co2Conces[i] < co2BoundaryValue[0]) {
             mvaddstr(y, x, "_");
         } else if (co2Conces[i] < co2BoundaryValue[1]) {
             mvaddstr(y, x, "-");
