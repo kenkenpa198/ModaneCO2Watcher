@@ -11,16 +11,16 @@
 
 /***************************************
  * CO2 濃度をログへ書き込む関数
- * 
+ *
  * 記録用 Python ファイルを実行する関数。
  * Python ファイル内部で CO2 濃度を測定とログ用 CSV への書き込み処理を行う。
- * 
+ *
  * ▼引数
  * なし
- * 
+ *
  * ▼戻り値
  * なし
- * 
+ *
  * TODO: 下記を検証する
  * - python ファイルが存在しなかった場合
  * python ファイルが権限エラーなどで実行できなかった場合
@@ -37,19 +37,19 @@ void doRecordCo2ConceToLogs(void) {
  * CO2 濃度をログから取得して配列を書き換える関数
  * CO2 濃度のログファイル最終行（最新の記録）から 6行飛ばし（1時間毎）に CO2 濃度を取得し、CO2 の濃度配列へ再代入する。
  * 再代入配列の後ろから行う。
- * 
+ *
  * 引数の指定がある場合、その行数分遡った先にある値を取得する。
  * 取得先の行が存在しなかった場合、 co2Conces の対応する要素は書き変わらない。
  * ファイルの展開に失敗した場合は何もしない。
- * 
+ *
  * TODO: ファイルの展開に失敗した場合、-1 に置き換えたり mvaddstr でメッセージを表示する？
- * 
+ *
  * ▼引数
  * int co2Conces[21] : CO2 濃度配列のポインタ
- * 
+ *
  * ▼戻り値
  * なし
- * 
+ *
 ***************************************/
 void getCo2ConcesFromLogs(int co2Conces[21]) {
     // ログファイルの展開
@@ -100,13 +100,13 @@ void getCo2ConcesFromLogs(int co2Conces[21]) {
 
 /***************************************
  * 天気取得コマンドを作成する関数
- * 
+ *
  * ▼引数
  * char wttrCmd[512] : 天気取得コマンド配列のポインタ
- * 
+ *
  * ▼戻り値
  * なし
- * 
+ *
 ***************************************/
 void makeWttrCmd(char wttrCmd[512]) {
     // 取得するロケールを初期化
@@ -134,14 +134,14 @@ void makeWttrCmd(char wttrCmd[512]) {
 
 /***************************************
  * 天気を取得する関数
- * 
+ *
  * ▼引数
  * char wttrCmd[512]      : 天気取得コマンド配列のポインタ
  * char wttrLines[2][512] : 天気情報を格納する二次元配列ポインタ（512バイト × 2）
- * 
+ *
  * ▼戻り値
  * なし
- * 
+ *
 ***************************************/
 void getWttrLines(char wttrCmd[512], char wttrLines[2][512]) {
     // 天気の格納用配列を宣言
@@ -160,15 +160,15 @@ void getWttrLines(char wttrCmd[512], char wttrLines[2][512]) {
 
 /***************************************
  * 描画用関数 : 現在時刻を毎秒描画する
- * 
+ *
  * ▼引数
  * int y      : 描画を行う Y 座標
  * int x      : 描画を行う X 座標
  * time_t now : time(NULL) で取得できる UNIX 時間
- * 
+ *
  * ▼戻り値
  * なし
- * 
+ *
 ***************************************/
 void printDatetime(int y, int x, time_t now) {
     char datetime[64];
@@ -189,15 +189,15 @@ void printDatetime(int y, int x, time_t now) {
 
 /***************************************
  * 描画用関数 : 天気を描画する
- * 
+ *
  * ▼引数
  * int y                  : 描画を行う Y 座標
  * int x                  : 描画を行う X 座標
  * char wttrLines[2][512] : 天気文字列の二次元配列のポインタ
- * 
+ *
  * ▼戻り値
  * なし
- * 
+ *
 ***************************************/
 void printWttr(int y, int x, char wttrLines[2][512]) {
     for (int i = 0; i < 2; i++) {
@@ -208,28 +208,28 @@ void printWttr(int y, int x, char wttrLines[2][512]) {
 
 /***************************************
  * 描画用関数 : CO2グラフの軸を描画する
- * 
+ *
  * ▼引数
  * int y      : 描画を行う Y 座標
  * int x      : 描画を行う X 座標
  * time_t now : time(NULL) で取得できる UNIX 時間
- * 
+ *
  * ▼戻り値
  * なし
- * 
+ *
  * TODO: キー入力を受け取ったらグラフの表示を可変したい
- * 
+ *
 ***************************************/
 void printCo2GraphBase(int y, int x) {
     char co2GraphBaseLines[7][64] = {
         //                            XXXX ←この列に現在の ppm 数値が入るのでその分スペースを確保している
         "(ppm)                            ",
-        " 2000 |                          ",
-        "      |                          ",
         " 1000 |                          ",
         "      |                          ",
+        "  500 |                          ",
+        "      |                          ",
         "    0 +---------------------     ",
-        "      -20m      -10m      Cur.   "
+        "      -20h      -10h      Cur.   "
     };
 
     for (int i = 0; i < 7; i++) {
@@ -240,15 +240,15 @@ void printCo2GraphBase(int y, int x) {
 
 /***************************************
  * 描画用関数 : CO2グラフの折れ線グラフを描画する
- * 
+ *
  * ▼引数
  * int y             : 描画を行う Y 座標
  * int x             : 描画を行う X 座標
  * int co2Conces[21] : CO2 濃度配列
- * 
+ *
  * ▼戻り値
  * なし
- * 
+ *
 ***************************************/
 void printCo2LineGraph(int y, int x, int co2Conces[21]) {
     // 境界値配列の初期化
@@ -256,7 +256,7 @@ void printCo2LineGraph(int y, int x, int co2Conces[21]) {
     // NOTE: 切り捨て時の端数を考慮していないため、少しずつ境界値が本来の境界値よりズレていく
     int co2BoundaryValue[11];
     for (int i = 0; i < 11; i++) {
-        co2BoundaryValue[i] = 250 + 167 * (i + 1);
+        co2BoundaryValue[i] = 125 + 83 * (i + 1);
     }
 
     // 折れ線グラフの描画
@@ -294,22 +294,22 @@ void printCo2LineGraph(int y, int x, int co2Conces[21]) {
 
 /***************************************
  * 描画用関数 : CO2グラフ右側へ現在の値を描画する
- * 
+ *
  * ▼引数
  * int y           : 描画を行う Y 座標
  * int x           : 描画を行う X 座標
  * int co2ValueNow : 現在の CO2 濃度
- * 
+ *
  * ▼戻り値
  * なし
- * 
+ *
 ***************************************/
 void printCo2ValueNow(int y, int x, int co2ValueNow) {
-        if (co2ValueNow < 750) {
+        if (co2ValueNow < 375) {
             mvprintw(y    , x, "%4d", co2ValueNow);
-        } else if (co2ValueNow < 1250) {
+        } else if (co2ValueNow < 625) {
             mvprintw(y - 1, x, "%4d", co2ValueNow);
-        } else if (co2ValueNow < 1750) {
+        } else if (co2ValueNow < 875) {
             mvprintw(y - 2, x, "%4d", co2ValueNow);
         } else {
             mvprintw(y - 3, x, "%4d", co2ValueNow);
@@ -319,15 +319,15 @@ void printCo2ValueNow(int y, int x, int co2ValueNow) {
 
 /***************************************
  * 描画用関数 : CO2グラフを1秒毎に点滅させる
- * 
+ *
  * ▼引数
  * int y           : 描画を行う Y 座標
  * int x           : 描画を行う X 座標
  * int co2ValueNow : time_t now : time(NULL) で取得できる UNIX 時間
- * 
+ *
  * ▼戻り値
  * なし
- * 
+ *
 ***************************************/
 void doBlinkCo2Graph(int y, int x, time_t now) {
     if (now % 2 == 0) {
@@ -341,16 +341,16 @@ void doBlinkCo2Graph(int y, int x, time_t now) {
 
 /***************************************
  * 描画用関数 : もだねちゃん AA を描画する
- * 
+ *
  * ▼引数
  * int y        : 描画を行う Y 座標
  * int x        : 描画を行う X 座標
  * int eyeNum   : 表示する目の添え字
  * int mouthNum : 表示する口の添え字
- * 
+ *
  * ▼戻り値
  * なし
- * 
+ *
 ***************************************/
 void printModane(int y, int x, int eyeNum, int mouthNum) {
     // AA 用配列を初期化
