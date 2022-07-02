@@ -562,8 +562,8 @@ int main(void) {
         ***************************************/
         printModane(h / 2 - 5, 2, eyeNum, mouthNum);
 
-        // 4秒毎に次のループ用の乱数を生成
-        if (now % 4 == 0) {
+        // 10秒毎に次のループ用の乱数を生成
+        if (now % 10 == 0) {
             eyeNum   = rand() % 20 + 1;
             mouthNum = rand() % 2 + 1;
         }
