@@ -466,10 +466,10 @@ int main(void) {
     doRecordCo2ConceToLogs();
 
     // 取得行数の定数とグラフの表示形式を定義（初期値は NARROW とする）
-    const int NARROW = 1;
-    const int MEDIUM = 3;
-    const int BROAD  = 6;
-    int co2Style = BROAD;
+    const int NARROW = 1; //  3 時間前まで（ログから1行毎に取得）
+    const int MEDIUM = 3; // 10 時間前まで（ログから3行毎に取得）
+    const int BROAD  = 6; // 20 時間前まで（ログから6行毎に取得）
+    int co2Style = NARROW;
 
     // CO2 濃度配列の初期化・ログファイルから過去の CO2 濃度を取得して配列へ格納
     int co2Conces[21] = {0};
