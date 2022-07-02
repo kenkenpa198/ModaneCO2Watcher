@@ -598,22 +598,22 @@ int main(void) {
         }
 
         // グラフのベースを描画
-        printCo2GraphBase(h - 8, w - 35, co2Style);
+        printCo2GraphBase(h - 9, w - 35, co2Style);
 
         // CO2 濃度配列を折れ線グラフで描画
-        printCo2LineGraph(h - 4, w - 28, co2Conces);
+        printCo2LineGraph(h - 5, w - 28, co2Conces);
 
         // CO2 濃度配列の現在の数値を描画
-        printCo2ValueNow(h - 4, w - 6, co2Conces[20]);
+        printCo2ValueNow(h - 5, w - 6, co2Conces[20]);
 
         // 1秒毎に現在のグラフ線部分にスペースを上書きして点滅させる
-        doBlinkCo2Graph(h - 4, w - 7, now);
+        doBlinkCo2Graph(h - 5, w - 7, now);
 
 
         /***************************************
          * もだねちゃんの描画処理
         ***************************************/
-        printModane(h / 2 - 5, 2, eyeNum, mouthNum);
+        printModane(h / 2 - 6, 2, eyeNum, mouthNum);
 
         // 10秒毎に次のループ用の乱数を生成
         if (now % 10 == 0) {
