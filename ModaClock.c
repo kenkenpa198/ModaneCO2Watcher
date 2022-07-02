@@ -238,17 +238,19 @@ void printWttr(int y, int x, char wttrLines[2][512]) {
 ***************************************/
 int printCo2GraphBase(int y, int x, int co2Style) {
 
-    char co2GraphBaseLines[6][64] = {
+    char co2GraphBaseLines[8][64] = {
         //                            XXXX ←この列に現在の ppm 数値が入るのでその分スペースを確保している
         "(ppm)                            ",
-        " 1000 |                          ",
+        "  900 |                          ",
         "      |                          ",
-        "  500 |                          ",
+        "  600 |                          ",
+        "      |                          ",
+        "  300 |                          ",
         "      |                          ",
         "    0 +---------------------     "
     };
 
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 8; i++) {
         mvaddstr(y++, x, co2GraphBaseLines[i]);
     }
 
@@ -287,42 +289,55 @@ int printCo2GraphBase(int y, int x, int co2Style) {
 ***************************************/
 void printCo2LineGraph(int y, int x, int co2Conces[21]) {
     // 境界値配列の初期化
-    // 下限値値（250）+ 2000 / 12 の値を切り捨てた値（167）* 繰り返し回数（i）で境界値を計算
-    // NOTE: 切り捨て時の端数を考慮していないため、少しずつ境界値が本来の境界値よりズレていく
-    int co2BoundaryValue[11];
-    for (int i = 0; i < 11; i++) {
-        co2BoundaryValue[i] = 125 + 83 * (i + 1);
+    // 下限値 + (上限値 / (行数 * 3)) * 繰り返し回数（i）で境界値を計算
+    int co2BoundaryValue[18] = {0};
+    for (int i = 0; i < 18; i++) {
+        co2BoundaryValue[i] = 75 + 50 * (i + 1);
     }
 
     // 折れ線グラフの描画
     // TODO: もっと綺麗に書く
     for (int i = 0; i < 21; i++) {
         if (co2Conces[i] <= 0) {
-            mvaddstr(y, x, " ");
-        } else if (co2Conces[i] < co2BoundaryValue[0]) {
-            mvaddstr(y, x, "_");
-        } else if (co2Conces[i] < co2BoundaryValue[1]) {
-            mvaddstr(y, x, "-");
-        } else if (co2Conces[i] < co2BoundaryValue[2]) {
-            mvaddstr(y, x, "`");
-        } else if (co2Conces[i] < co2BoundaryValue[3]) {
+            mvaddstr(y    , x, " ");
+        } else if (co2Conces[i] <= co2BoundaryValue[0]) {
+            mvaddstr(y    , x, "_");
+        } else if (co2Conces[i] <= co2BoundaryValue[1]) {
+            mvaddstr(y    , x, "-");
+        } else if (co2Conces[i] <= co2BoundaryValue[2]) {
+            mvaddstr(y    , x, "`");
+        } else if (co2Conces[i] <= co2BoundaryValue[3]) {
             mvaddstr(y - 1, x, "_");
-        } else if (co2Conces[i] < co2BoundaryValue[4]) {
+        } else if (co2Conces[i] <= co2BoundaryValue[4]) {
             mvaddstr(y - 1, x, "-");
-        } else if (co2Conces[i] < co2BoundaryValue[5]) {
+        } else if (co2Conces[i] <= co2BoundaryValue[5]) {
             mvaddstr(y - 1, x, "`");
-        } else if (co2Conces[i] < co2BoundaryValue[6]) {
+        } else if (co2Conces[i] <= co2BoundaryValue[6]) {
             mvaddstr(y - 2, x, "_");
-        } else if (co2Conces[i] < co2BoundaryValue[7]) {
+        } else if (co2Conces[i] <= co2BoundaryValue[7]) {
             mvaddstr(y - 2, x, "-");
-        } else if (co2Conces[i] < co2BoundaryValue[8]) {
+        } else if (co2Conces[i] <= co2BoundaryValue[8]) {
             mvaddstr(y - 2, x, "`");
-        } else if (co2Conces[i] < co2BoundaryValue[9]) {
+        } else if (co2Conces[i] <= co2BoundaryValue[9]) {
             mvaddstr(y - 3, x, "_");
-        } else if (co2Conces[i] < co2BoundaryValue[10]) {
+        } else if (co2Conces[i] <= co2BoundaryValue[10]) {
             mvaddstr(y - 3, x, "-");
-        } else {
+        } else if (co2Conces[i] <= co2BoundaryValue[11]) {
             mvaddstr(y - 3, x, "`");
+        } else if (co2Conces[i] <= co2BoundaryValue[12]) {
+            mvaddstr(y - 4, x, "_");
+        } else if (co2Conces[i] <= co2BoundaryValue[13]) {
+            mvaddstr(y - 4, x, "-");
+        } else if (co2Conces[i] <= co2BoundaryValue[14]) {
+            mvaddstr(y - 4, x, "`");
+        } else if (co2Conces[i] <= co2BoundaryValue[15]) {
+            mvaddstr(y - 5, x, "_");
+        } else if (co2Conces[i] <= co2BoundaryValue[16]) {
+            mvaddstr(y - 5, x, "-");
+        } else if (co2Conces[i] <= co2BoundaryValue[17]) {
+            mvaddstr(y - 5, x, "`");
+        } else {
+            mvaddstr(y - 6, x, "!");                      // 975 を超えていたら ! を描画
         }
         x++;
         }
@@ -342,14 +357,20 @@ void printCo2LineGraph(int y, int x, int co2Conces[21]) {
  *
 ***************************************/
 void printCo2ValueNow(int y, int x, int co2ValueNow) {
-        if (co2ValueNow < 375) {
+        if (co2ValueNow <= 225) {
             mvprintw(y    , x, "%4d", co2ValueNow);
-        } else if (co2ValueNow < 625) {
+        } else if (co2ValueNow <= 375) {
             mvprintw(y - 1, x, "%4d", co2ValueNow);
-        } else if (co2ValueNow < 875) {
+        } else if (co2ValueNow <= 525) {
             mvprintw(y - 2, x, "%4d", co2ValueNow);
-        } else {
+        } else if (co2ValueNow <= 675) {
             mvprintw(y - 3, x, "%4d", co2ValueNow);
+        } else if (co2ValueNow <= 825) {
+            mvprintw(y - 4, x, "%4d", co2ValueNow);
+        } else if (co2ValueNow <= 975) {
+            mvprintw(y - 5, x, "%4d", co2ValueNow);
+        } else {
+            mvprintw(y - 6, x, "%4d", co2ValueNow);
         }
     return;
 }
@@ -372,6 +393,9 @@ void doBlinkCo2Graph(int y, int x, time_t now) {
         mvaddstr(y - 1, x - 1, " ");
         mvaddstr(y - 2, x - 1, " ");
         mvaddstr(y - 3, x - 1, " ");
+        mvaddstr(y - 4, x - 1, " ");
+        mvaddstr(y - 5, x - 1, " ");
+        mvaddstr(y - 6, x - 1, " ");
     }
     return;
 }
@@ -598,7 +622,7 @@ int main(void) {
         }
 
         // グラフのベースを描画
-        printCo2GraphBase(h - 8, w - 35, co2Style);
+        printCo2GraphBase(h - 10, w - 35, co2Style);
 
         // CO2 濃度配列を折れ線グラフで描画
         printCo2LineGraph(h - 4, w - 28, co2Conces);
