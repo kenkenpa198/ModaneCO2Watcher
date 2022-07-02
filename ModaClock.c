@@ -239,15 +239,15 @@ void printWttr(int y, int x, char wttrLines[2][512]) {
 int printCo2GraphBase(int y, int x, int co2Style) {
 
     char co2GraphBaseLines[8][64] = {
-        //                            XXXX ←この列に現在の ppm 数値が入るのでその分スペースを確保している
-        "(ppm)                            ",
-        "  900 |                          ",
-        "      |                          ",
-        "  600 |                          ",
-        "      |                          ",
-        "  300 |                          ",
-        "      |                          ",
-        "    0 +---------------------     "
+        //                             XXXX ←この列に現在の ppm 数値が左詰めで入る
+        "(ppm)                       ",
+        "  900 |                     ",
+        "      |                     ",
+        "  600 |                     ",
+        "      |                     ",
+        "  300 |                     ",
+        "      |                     ",
+        "    0 +---------------------"
     };
 
     for (int i = 0; i < 8; i++) {
@@ -257,16 +257,16 @@ int printCo2GraphBase(int y, int x, int co2Style) {
     // 引数3に応じて X 軸の数値を置き換え
     switch (co2Style) {
         case 1:
-            //               "    0 +---------------------     "
-            mvaddstr(y++, x, "        -3h     -1.5h     Cur.   ");
+            //               "    0 +--------------------- XXXX"
+            mvaddstr(y++, x, "        -3h     -1.5h     Cur.");
             break;
         case 3:
-            //               "    0 +---------------------     "
-            mvaddstr(y++, x, "     -10h       -5h       Cur.   ");
+            //               "    0 +--------------------- XXXX"
+            mvaddstr(y++, x, "     -10h       -5h       Cur.");
             break;
         case 6:
-            //               "    0 +---------------------     "
-            mvaddstr(y++, x, "     -20h      -10h       Cur.   ");
+            //               "    0 +--------------------- XXXX"
+            mvaddstr(y++, x, "     -20h      -10h       Cur.");
             break;
         default:
             return 1;
@@ -358,19 +358,19 @@ void printCo2LineGraph(int y, int x, int co2Conces[21]) {
 ***************************************/
 void printCo2ValueNow(int y, int x, int co2ValueNow) {
         if (co2ValueNow <= 225) {
-            mvprintw(y    , x, "%4d", co2ValueNow);
+            mvprintw(y    , x, "%d", co2ValueNow);
         } else if (co2ValueNow <= 375) {
-            mvprintw(y - 1, x, "%4d", co2ValueNow);
+            mvprintw(y - 1, x, "%d", co2ValueNow);
         } else if (co2ValueNow <= 525) {
-            mvprintw(y - 2, x, "%4d", co2ValueNow);
+            mvprintw(y - 2, x, "%d", co2ValueNow);
         } else if (co2ValueNow <= 675) {
-            mvprintw(y - 3, x, "%4d", co2ValueNow);
+            mvprintw(y - 3, x, "%d", co2ValueNow);
         } else if (co2ValueNow <= 825) {
-            mvprintw(y - 4, x, "%4d", co2ValueNow);
+            mvprintw(y - 4, x, "%d", co2ValueNow);
         } else if (co2ValueNow <= 975) {
-            mvprintw(y - 5, x, "%4d", co2ValueNow);
+            mvprintw(y - 5, x, "%d", co2ValueNow);
         } else {
-            mvprintw(y - 6, x, "%4d", co2ValueNow);
+            mvprintw(y - 6, x, "%d", co2ValueNow);
         }
     return;
 }
@@ -622,16 +622,16 @@ int main(void) {
         }
 
         // グラフのベースを描画
-        printCo2GraphBase(h - 10, w - 35, co2Style);
+        printCo2GraphBase(h - 10, w - 34, co2Style);
 
         // CO2 濃度配列を折れ線グラフで描画
-        printCo2LineGraph(h - 4, w - 28, co2Conces);
+        printCo2LineGraph(h - 4, w - 27, co2Conces);
 
         // CO2 濃度配列の現在の数値を描画
-        printCo2ValueNow(h - 4, w - 6, co2Conces[20]);
+        printCo2ValueNow(h - 4, w - 5, co2Conces[20]);
 
         // 1秒毎に現在のグラフ線部分にスペースを上書きして点滅させる
-        doBlinkCo2Graph(h - 4, w - 7, now);
+        doBlinkCo2Graph(h - 4, w - 6, now);
 
 
         /***************************************
