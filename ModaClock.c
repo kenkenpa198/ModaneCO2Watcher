@@ -35,33 +35,43 @@ void doRecordCo2ConceToLogs(void) {
 
 /***************************************
  * CO2 濃度をログから取得して配列を書き換える関数
- * CO2 濃度のログファイル最終行（最新の記録）から 3行飛ばし（30分毎）に CO2 濃度を取得し、CO2 の濃度配列へ再代入する。
- * 再代入配列の後ろから行う。
+ * 
+ * CO2 濃度のログファイル最終行（最新の記録）から 指定行数飛ばしに CO2 濃度を取得し、CO2 の濃度配列へ再代入する。
+ * 再代入は配列の後ろから行う。
  *
- * 引数の指定がある場合、その行数分遡った先にある値を取得する。
- * 取得先の行が存在しなかった場合、 co2Conces の対応する要素は書き変わらない。
- * ファイルの展開に失敗した場合は何もしない。
+ * 引数2に指定された値で取得する行数の間隔が変化する。
+ * 1 の場合は1行毎（10分毎）、6 の場合は6行毎（60分毎）という感じ。
+ * 指定行数の間隔に沿って順に取得していき、取得先の行が存在しなくなったらその時点で取得を終了する。
  *
- * TODO: ファイルの展開に失敗した場合、-1 に置き換えたり mvaddstr でメッセージを表示する？
+ * 引数2 の指定が 0 であれば 1 を返す。
+ * ファイルの展開に失敗した場合は 2 を返す。
  *
  * ▼引数
  * int co2Conces[21] : CO2 濃度配列のポインタ
+ * int getInterval   : 取得する行数の間隔
  *
  * ▼戻り値
- * なし
+ * 0                 : 正常終了
+ * 1                 : 異常終了（引数エラー）
+ * 2                 : 異常終了（ファイルの展開に失敗）
  *
 ***************************************/
-void getCo2ConcesFromLogs(int co2Conces[21]) {
+int getCo2ConcesFromLogs(int co2Conces[21], int getInterval) {
+
+    // 引数が指定外だった場合は 1 を返して終了
+    if (getInterval <= 0) {
+        return 1;
+    }
+
     // ログファイルの展開
     char filepath[128] = "./logs/co2_conces.csv";
     FILE * fp;
     fp = fopen(filepath, "r");
 
-    // ファイルの展開に失敗した場合の処理
+    // ファイルの展開に失敗したら 2 を返して終了
     if (!fp) {
-        // TODO: ファイルの展開に失敗した場合、-1 に置き換えたり mvaddstr でメッセージを表示する？
         fclose(fp);
-        return;
+        return 2;
     }
 
     // 取得用変数・配列の宣言
@@ -87,15 +97,15 @@ void getCo2ConcesFromLogs(int co2Conces[21]) {
     }
     fclose(fp);
 
-    // ヒープ配列の最終要素から3個毎（30分毎）に CO2 配列の最終要素から順に再代入する
+    // ヒープ配列の最終要素から指定行数毎に CO2 配列の最終要素から順に再代入する
     int c = lineCount - 1; // lineCount を添え字に合わせる
     for (int i = 20; i >= 0 && c >= 0; i--) {
         co2Conces[i] = co2ConcesHeap[c];
-        c -= 3;
+        c -= getInterval;
     }
     free(co2ConcesHeap); // ヒープの解放
 
-    return;
+    return 0;
 }
 
 /***************************************
@@ -209,33 +219,58 @@ void printWttr(int y, int x, char wttrLines[2][512]) {
 /***************************************
  * 描画用関数 : CO2グラフの軸を描画する
  *
+ * 引数3 で渡された値によって横軸のグラフの表示を変更する。
+ *   1 (NARROW) : 10分/1列
+ *   3 (MEDIUM) : 30分/1列
+ *   6 (BROAD)  : 60分/1列
+ *
  * ▼引数
- * int y      : 描画を行う Y 座標
- * int x      : 描画を行う X 座標
- * time_t now : time(NULL) で取得できる UNIX 時間
+ * int y        : 描画を行う Y 座標
+ * int x        : 描画を行う X 座標
+ * int co2Style : CO2 定数指定
  *
  * ▼戻り値
- * なし
+ * 0            : 正常終了
+ * 1            : 異常終了（引数3が指定外だった場合）
  *
- * TODO: キー入力を受け取ったらグラフの表示を可変したい
+ * TODO: switch 文をきれいにする
  *
 ***************************************/
-void printCo2GraphBase(int y, int x) {
-    char co2GraphBaseLines[7][64] = {
+int printCo2GraphBase(int y, int x, int co2Style) {
+
+    char co2GraphBaseLines[6][64] = {
         //                            XXXX ←この列に現在の ppm 数値が入るのでその分スペースを確保している
         "(ppm)                            ",
         " 1000 |                          ",
         "      |                          ",
         "  500 |                          ",
         "      |                          ",
-        "    0 +---------------------     ",
-        "     -10h       -5h       Cur.   "
+        "    0 +---------------------     "
     };
 
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < 6; i++) {
         mvaddstr(y++, x, co2GraphBaseLines[i]);
     }
-    return;
+
+    // 引数3に応じて X 軸の数値を置き換え
+    switch (co2Style) {
+        case 1:
+            //               "    0 +---------------------     "
+            mvaddstr(y++, x, "        -3h     -1.5h     Cur.   ");
+            break;
+        case 3:
+            //               "    0 +---------------------     "
+            mvaddstr(y++, x, "     -10h       -5h       Cur.   ");
+            break;
+        case 6:
+            //               "    0 +---------------------     "
+            mvaddstr(y++, x, "     -20h      -10h       Cur.   ");
+            break;
+        default:
+            return 1;
+    }
+
+    return 0;
 }
 
 /***************************************
@@ -424,15 +459,21 @@ int main(void) {
     /***************************************
      * CO2 グラフの描画処理準備
     ***************************************/
-    printf("CO2 グラフの描画処理準備を開始します\n");
+    printf("CO2 グラフの描画処理準備を開始します。\n");
 
     // 起動時の CO2 濃度を記録
     // TODO: 実行を繰り返すとその分時間がズレてしまうので、ここではファイルを作成するのみにする？
     doRecordCo2ConceToLogs();
 
+    // 取得行数の定数とグラフの表示形式を定義（初期値は NARROW とする）
+    const int NARROW = 1;
+    const int MEDIUM = 3;
+    const int BROAD  = 6;
+    int co2Style = BROAD;
+
     // CO2 濃度配列の初期化・ログファイルから過去の CO2 濃度を取得して配列へ格納
     int co2Conces[21] = {0};
-    getCo2ConcesFromLogs(co2Conces);
+    getCo2ConcesFromLogs(co2Conces, co2Style);
 
     // 取得したCO2配列の確認
     for (int i = 0; i < 21; i++) {
@@ -441,10 +482,11 @@ int main(void) {
     printf("\n");
 
 
+
     /***************************************
      * 天気の描画処理準備
     ***************************************/
-    printf("天気の描画処理準備を開始します\n");
+    printf("天気の描画処理準備を開始します。\n");
 
     // wttr コマンドの作成
     char wttrCmd[512];
@@ -460,7 +502,7 @@ int main(void) {
     /***************************************
      * もだねちゃんの描画処理準備
     ***************************************/
-    printf("もだねちゃんの描画処理準備を開始します\n");
+    printf("もだねちゃんの描画処理準備を開始します。\n");
 
     // 目と口を出し分けするための乱数用変数を初期化
     int eyeNum       = 1;
@@ -468,9 +510,20 @@ int main(void) {
 
 
     /***************************************
+     * キー入力とステータスバーの描画処理準備
+    ***************************************/
+    printf("キー入力とステータスバーの描画処理準備を開始します。\n");
+
+    // 変数を初期化
+    int StatusCount = 0; // ステータスバーの表示時間を管理する変数
+    int PushedKey;       // 押されたキーを保持しておく変数
+    int PrevKey;         // 前回押されたキーを保持しておく変数
+
+
+    /***************************************
      * 画面描画の準備
     ***************************************/
-    printf("画面描画の準備を開始します\n");
+    printf("画面描画の準備を開始します。\n");
 
     time_t prev, now;            // 現在とループ前の時間
     int w, h;                    // 描画する画面の幅・高さ
@@ -536,16 +589,16 @@ int main(void) {
 
 
         /***************************************
-         * CO2 濃度グラフの描画処理
+         * CO2 グラフの描画処理
         ***************************************/
         // 10分毎にログへ書き込み & 配列の更新
         if (now % (60 * 10) == 0) {
             doRecordCo2ConceToLogs();
-            getCo2ConcesFromLogs(co2Conces);
+            getCo2ConcesFromLogs(co2Conces, co2Style);
         }
 
         // グラフのベースを描画
-        printCo2GraphBase(h - 8, w - 35);
+        printCo2GraphBase(h - 8, w - 35, co2Style);
 
         // CO2 濃度配列を折れ線グラフで描画
         printCo2LineGraph(h - 4, w - 28, co2Conces);
@@ -570,19 +623,88 @@ int main(void) {
 
 
         /***************************************
-         * 描画処理後半
+         * キー入力の待ち受け処理
         ***************************************/
-        // 画面を再描画
-        refresh();
-
-        // TODO: G キーでグラフを拡大/縮小する
-        // TODO: 他のキーだったらヘルプを下に表示する
-
-        // Q キーを受け取ったらループを抜ける
+        // キー入力の受け取り
         key = getch();
+
+        // Q キーを受け取ったらステータスバーに表示してループを抜ける
         if (key == 'q') {
+            mvaddstr(h - 1, 0, "Q キーを受け取りました。プログラムを終了します。");
+            refresh();
+            sleep(2);
             break;
         }
+
+        // キーに応じた処理
+        switch (key) {
+
+            // キーが押されていない（key に -1 が格納されている）なら何もしない
+            case -1:
+                break;
+
+            // A キーであれば CO2 グラフを 20時間前 までの表示へ切り替え
+            case 'a':
+                StatusCount = 3;                           // ステータスバーの表示ループ数を設定
+                PushedKey = key;                           // ステータスバー表示用に押されたキーを保存
+                co2Style = BROAD;                          // CO2 表示の切り替え
+                getCo2ConcesFromLogs(co2Conces, co2Style); // CO2 配列の再取得
+                break;
+
+            // S キーであれば CO2 グラフを 10時間前 までの表示へ切り替え
+            case 's':
+                StatusCount = 3;
+                PushedKey = key;
+                co2Style = MEDIUM;
+                getCo2ConcesFromLogs(co2Conces, co2Style);
+                break;
+
+            // D キーであれば CO2 グラフを 3時間前 までの表示へ切り替え
+            case 'd':
+                StatusCount = 3;
+                PushedKey = key;
+                co2Style = NARROW;
+                getCo2ConcesFromLogs(co2Conces, co2Style);
+                break;
+
+            // 他のキーであれば格納だけを行う
+            default:
+                StatusCount = 3;
+                PushedKey = key;
+        }
+
+
+        /***************************************
+         * ステータスバーの処理
+        ***************************************/
+        // ステータスバーの表示ループ数が残っている間表示処理を行う
+        if (StatusCount > 0) {
+
+            // 保存されているキーに応じてステータスバーへメッセージを表示
+            switch (PushedKey) {
+                case 'a':
+                    mvaddstr(h - 1, 0, "CO2 グラフを 20時間前 までの表示へ切り替えます。");
+                    break;
+                case 's':
+                    mvaddstr(h - 1, 0, "CO2 グラフを 10時間前 までの表示へ切り替えます。");
+                    break;
+                case 'd':
+                    mvaddstr(h - 1, 0, "CO2 グラフを 3時間前 までの表示へ切り替えます。");
+                    break;
+                default:
+                    mvaddstr(h - 1, 0, "A S D : CO2 グラフの切り替え  Q : 終了");
+
+            }
+
+            StatusCount--;
+        }
+
+
+        /***************************************
+         * 画面の更新
+        ***************************************/
+        refresh();
+
     }
 
     endwin(); // 端末制御の終了
