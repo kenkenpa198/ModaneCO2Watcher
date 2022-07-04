@@ -53,4 +53,4 @@ os.makedirs(dir_path, exist_ok=True)
 filename = 'co2_conces.csv'
 with open(dir_path + filename, 'a') as f:
     writer = csv.writer(f)
-    writer.writerow([verified_co2_conce, now])
+    writer.writerow([now, verified_co2_conce])

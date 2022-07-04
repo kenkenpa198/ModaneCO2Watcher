@@ -22,9 +22,9 @@
  * なし
  *
  * TODO: 下記を検証する
- * - python ファイルが存在しなかった場合
+ * python ファイルが存在しなかった場合
  * python ファイルが権限エラーなどで実行できなかった場合
- * python ファイルの実行中に何らかのエラーが起こった場合
+ * python ファイルの実行中に何らかのエラーが起こった場合 ⇒ インポートエラーの場合、エラーが発生してもプログラム自体は終了後そのまま続行する
  * python ファイルの中で呼び出している mh_z19 のセンサーが起動していなかった場合
 
 ***************************************/
@@ -91,7 +91,8 @@ int getCo2ConcesFromLogs(int co2Conces[21], int getInterval) {
 
     // 行数を数えつつ CO2 濃度をヒープ配列へ代入
     for (int i = 0; fgets(buf, size, fp) != NULL; i++) {
-        sscanf(buf, "%d, %[^\n]", &co2Conce, gotDatetime);
+        sscanf(buf, "%[^,], %d", gotDatetime, &co2Conce);
+
         co2ConcesHeap[i] = co2Conce;
         lineCount++;
     }
