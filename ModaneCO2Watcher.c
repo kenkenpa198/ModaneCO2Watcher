@@ -15,18 +15,14 @@
  * 記録用 Python ファイルを実行する関数。
  * Python ファイル内部で CO2 濃度を測定とログ用 CSV への書き込み処理を行う。
  *
+ * python ファイルが存在しない、インポートエラーが起こった場合などが発生した場合は Python のエラーが画面に出力される。
+ * 
  * ▼引数
  * なし
  *
  * ▼戻り値
  * なし
- *
- * TODO: 下記を検証する
- * python ファイルが存在しなかった場合
- * python ファイルが権限エラーなどで実行できなかった場合
- * python ファイルの実行中に何らかのエラーが起こった場合 ⇒ インポートエラーの場合、エラーが発生してもプログラム自体は終了後そのまま続行する
- * python ファイルの中で呼び出している mh_z19 のセンサーが起動していなかった場合
-
+ * 
 ***************************************/
 void doRecordCo2ConceToLogs(void) {
     system("python3 record_co2_conce.py");
@@ -35,7 +31,7 @@ void doRecordCo2ConceToLogs(void) {
 
 /***************************************
  * CO2 濃度をログから取得して配列を書き換える関数
- * 
+ *
  * CO2 濃度のログファイル最終行（最新の記録）から 指定行数飛ばしに CO2 濃度を取得し、CO2 の濃度配列へ再代入する。
  * 再代入は配列の後ろから行う。
  *
@@ -47,16 +43,16 @@ void doRecordCo2ConceToLogs(void) {
  * ファイルの展開に失敗した場合は 2 を返す。
  *
  * ▼引数
- * int co2Conces[21] : CO2 濃度配列のポインタ
- * int getInterval   : 取得する行数の間隔
+ * int co2Conces[] : CO2 濃度を格納する配列のポインタ
+ * int getInterval : 取得する行数の間隔
  *
  * ▼戻り値
- * 0                 : 正常終了
- * 1                 : 異常終了（引数エラー）
- * 2                 : 異常終了（ファイルの展開に失敗）
+ * 0               : 正常終了
+ * 1               : 異常終了（引数エラー）
+ * 2               : 異常終了（ファイルの展開に失敗）
  *
 ***************************************/
-int getCo2ConcesFromLogs(int co2Conces[21], int getInterval) {
+int getCo2ConcesFromLogs(int co2Conces[], int getInterval) {
 
     // 引数が指定外だった場合は 1 を返して終了
     if (getInterval <= 0) {
@@ -64,8 +60,8 @@ int getCo2ConcesFromLogs(int co2Conces[21], int getInterval) {
     }
 
     // ログファイルの展開
-    char filepath[128] = "./logs/co2_conces.csv";
-    FILE * fp;
+    char filepath[] = "./logs/co2_conces.csv";
+    FILE* fp;
     fp = fopen(filepath, "r");
 
     // ファイルの展開に失敗したら 2 を返して終了
@@ -79,11 +75,11 @@ int getCo2ConcesFromLogs(int co2Conces[21], int getInterval) {
     char buf[size];       // 取得データ格納先へのポインタ
     int lineCount = 0;    // 行カウント
     int co2Conce;         // CO2 濃度値
-    char gotDatetime[64]; // 日付。ただし格納するけど使わない。省きたい…
+    char gotDatetime[64]; // 日付。関数終了時に消滅
 
     // ヒープを確保
     int* co2ConcesHeap;
-    co2ConcesHeap = (int*)malloc(sizeof(int) * 60000); // 1年分くらい
+    co2ConcesHeap = (int*)malloc(sizeof(int) * 100000); // 1.5年分くらい
     if (co2ConcesHeap == NULL) {
         // ヒープが確保できなかったらプログラムを強制終了する
         exit(0);
@@ -92,7 +88,6 @@ int getCo2ConcesFromLogs(int co2Conces[21], int getInterval) {
     // 行数を数えつつ CO2 濃度をヒープ配列へ代入
     for (int i = 0; fgets(buf, size, fp) != NULL; i++) {
         sscanf(buf, "%[^,], %d", gotDatetime, &co2Conce);
-
         co2ConcesHeap[i] = co2Conce;
         lineCount++;
     }
@@ -113,32 +108,32 @@ int getCo2ConcesFromLogs(int co2Conces[21], int getInterval) {
  * 天気取得コマンドを作成する関数
  *
  * ▼引数
- * char wttrCmd[512] : 天気取得コマンド配列のポインタ
+ * char wttrCmd[] : 天気取得コマンド配列のポインタ
  *
  * ▼戻り値
  * なし
  *
 ***************************************/
-void makeWttrCmd(char wttrCmd[512]) {
-    // 取得するロケールを初期化
-    const char* WTTR_LOCALE = "Tokyo";
+void makeWttrCmd(char wttrCmd[]) {
+    char wttrLocale[160];
 
-    // 環境変数に WTTR_LOCALE が設定してあればその値を読み込む
-    if (getenv("WTTR_LOCALE")) {
-        WTTR_LOCALE = getenv("WTTR_LOCALE");
-        printf("天気表示用の環境変数を読み込みました。\n");
-    } else {
-        printf("天気表示用の環境変数が読み込めなかったため、デフォルト設定 \"%s\" を使用します。\n", WTTR_LOCALE);
+    // WTTR_LOCALE 環境変数の読み込み
+    const char *temp = getenv("WTTR_LOCALE");
+    if (temp == NULL || strlen(temp) > 159) {
+        // 環境変数を読み込めなかった もしくは 159 バイトを超過 であればデフォルト設定
+        strcpy(wttrLocale, "Tokyo");
+        printf("天気表示用の環境変数が読み込めなかったため、デフォルト設定 \"%s\" を使用します。\n", wttrLocale);
         printf("好きな場所の天気予報を表示したい場合、WTTR_LOCALE 環境変数を設定してください。\n");
-        printf("example : $ export WTTR_LOCALE=\"Tokyo\"\n\n");
+        printf("example : $ export WTTR_LOCALE=\"Tokyo\" ※値は半角 159 文字以下\n\n");
+    } else {
+        // 問題なければ環境変数を wttrLocale へ格納
+        strcpy(wttrLocale, getenv("WTTR_LOCALE"));
+        printf("天気表示用の環境変数を読み込みました。\n");
     }
-    printf("WTTR_LOCALE : %s\n", WTTR_LOCALE);
-
-    const char* WTTR_OPTION = "0MQT";                // wttr のオプション
-    const char* WTTR_FORMAT = "&format=%C\\n%t+%p'"; // フォーマット指定
+    printf("wttrLocale : %s\n", wttrLocale);
 
     // 天気取得コマンドを wttrCmd 配列へ格納
-    sprintf(wttrCmd, "curl -fs 'wttr.in/%s?%s%s", WTTR_LOCALE, WTTR_OPTION, WTTR_FORMAT);
+    sprintf(wttrCmd, "curl -fs 'wttr.in/%s?%s", wttrLocale, "0MQT&format=%C\\n%t+%p'");
 
     return;
 }
@@ -147,20 +142,32 @@ void makeWttrCmd(char wttrCmd[512]) {
  * 天気を取得する関数
  *
  * ▼引数
- * char wttrCmd[512]      : 天気取得コマンド配列のポインタ
- * char wttrLines[2][512] : 天気情報を格納する二次元配列ポインタ（512バイト × 2）
+ * char wttrCmd[]               : 天気取得コマンド配列のポインタ
+ * int size1                    : 天気情報を格納している二次元配列の1次元目配列の要素数
+ * int size2                    : 天気情報を格納している二次元配列の2次元目配列の要素数
+ * char wttrLines[size1][size2] : 天気情報を格納している二次元配列のポインタ
  *
  * ▼戻り値
  * なし
  *
+ * TODO: 天気の取得時にサーバーの応答待ちの分、表示が遅れてしまう。スレッド処理にしてラグを無くしたい。
+ * 
 ***************************************/
-void getWttrLines(char wttrCmd[512], char wttrLines[2][512]) {
+void getWttrLines(char wttrCmd[], int size1, int size2, char wttrLines[size1][size2]) {
     // 天気の格納用配列を宣言
-    FILE * fp = NULL;
+    FILE* fp = NULL;
 
     // 天気取得コマンドの実行
     fp = popen(wttrCmd, "r"); // コマンド実行結果を fp へ格納
-    for (int i = 0; i < 2; i++) {
+
+    // fp が NULL だった場合はエラー文を格納して処理を中断
+    if (fp == NULL) {
+        strcpy(wttrLines[0], "Wttr command result was not returned.");
+        strcpy(wttrLines[1], "");
+        return;
+    }
+
+    for (int i = 0; i < size1; i++) {
         fgets(wttrLines[i], sizeof(wttrLines[i]), fp) != NULL; // 1行ごとに配列へ格納
     }
 
@@ -202,16 +209,18 @@ void printDatetime(int y, int x, time_t now) {
  * 描画用関数 : 天気を描画する
  *
  * ▼引数
- * int y                  : 描画を行う Y 座標
- * int x                  : 描画を行う X 座標
- * char wttrLines[2][512] : 天気文字列の二次元配列のポインタ
+ * int y                        : 描画を行う Y 座標
+ * int x                        : 描画を行う X 座標
+ * int size1                    : 天気情報を格納している二次元配列の1次元目配列の要素数
+ * int size2                    : 天気情報を格納している二次元配列の2次元目配列の要素数
+ * char wttrLines[size1][size2] : 天気情報を格納している二次元配列のポインタ
  *
  * ▼戻り値
  * なし
  *
 ***************************************/
-void printWttr(int y, int x, char wttrLines[2][512]) {
-    for (int i = 0; i < 2; i++) {
+void printWttr(int y, int x, int size1, int size2, char wttrLines[size1][size2]) {
+    for (int i = 0; i < size1; i++) {
         mvaddstr(y++, x - strlen(wttrLines[i]), wttrLines[i]);
     }
     return;
@@ -234,12 +243,10 @@ void printWttr(int y, int x, char wttrLines[2][512]) {
  * 0            : 正常終了
  * 1            : 異常終了（引数3が指定外だった場合）
  *
- * TODO: switch 文をきれいにする
- *
 ***************************************/
 int printCo2GraphBase(int y, int x, int co2Style) {
 
-    char co2GraphBaseLines[8][64] = {
+    char co2GraphBaseLines[][29] = {
         //                             XXXX ←この列に現在の ppm 数値が左詰めで入る
         "(ppm)                       ",
         "  900 |                     ",
@@ -390,13 +397,9 @@ void printCo2ValueNow(int y, int x, int co2ValueNow) {
 ***************************************/
 void doBlinkCo2Graph(int y, int x, time_t now) {
     if (now % 2 == 0) {
-        mvaddstr(y    , x - 1, " ");
-        mvaddstr(y - 1, x - 1, " ");
-        mvaddstr(y - 2, x - 1, " ");
-        mvaddstr(y - 3, x - 1, " ");
-        mvaddstr(y - 4, x - 1, " ");
-        mvaddstr(y - 5, x - 1, " ");
-        mvaddstr(y - 6, x - 1, " ");
+        for (int i = 0; i < 7; i++) {
+            mvaddstr(y - i, x - 1, " ");
+        }
     }
     return;
 }
@@ -416,7 +419,7 @@ void doBlinkCo2Graph(int y, int x, time_t now) {
 ***************************************/
 void printModane(int y, int x, int eyeNum, int mouthNum) {
     // AA 用配列を初期化
-    char modaneTopLines[7][64] = {
+    char modaneTopLines[][32] = {
         "         ____      ",
         "       /      \\    ",
         "      ( ____   ﾚ-、",
@@ -426,18 +429,18 @@ void printModane(int y, int x, int eyeNum, int mouthNum) {
         "|  /        `-_  | "
     };
 
-    char modaneEyeLines[3][64] = {
+    char modaneEyeLines[][32] = {
         "(||   |    |   ||) ",  // Open
         "(|| -==    ==- ||) ",  // Close
         "(||  ＞    ＜  ||) "   // Gyu
     };
 
-    char modaneMouthLines[2][64] = {
+    char modaneMouthLines[][32] = {
         " \\) ,,  ワ  ,, (ﾉ  ", // Open
         " \\) ,,  ー  ,, (ﾉ  "  // Close
     };
 
-    char modaneBottomLines[2][64] = {
+    char modaneBottomLines[][32] = {
         "  )ヽ________ノ(   ",
         "      \\_父_/      "
     };
@@ -487,7 +490,7 @@ int main(void) {
     printf("CO2 グラフの描画処理準備を開始します。\n");
 
     // 起動時の CO2 濃度を記録
-    // TODO: 実行を繰り返すとその分時間がズレてしまうので、ここではファイルを作成するのみにする？
+    // TODO: 実行を繰り返すとその分時間がズレてしまうので、ここではファイルを作成するのみにした方がよい
     doRecordCo2ConceToLogs();
 
     // 取得行数の定数とグラフの表示形式を定義（初期値は NARROW とする）
@@ -514,13 +517,13 @@ int main(void) {
     printf("天気の描画処理準備を開始します。\n");
 
     // wttr コマンドの作成
-    char wttrCmd[512];
+    char wttrCmd[256];
     makeWttrCmd(wttrCmd);
-    printf("wttrCmd     : %s\n\n", wttrCmd);
+    printf("wttrCmd    : %s\n\n", wttrCmd);
 
     // 天気取得コマンドの初回実行
-    char wttrLines[2][512];
-    getWttrLines(wttrCmd, wttrLines);
+    char wttrLines[2][256];
+    getWttrLines(wttrCmd, 2, 256, wttrLines);
     printf("wttrLines :\n%s%s\n\n", wttrLines[0], wttrLines[1]);
 
 
@@ -604,12 +607,11 @@ int main(void) {
          * 天気の描画処理
         ***************************************/
         // 天気の描画
-        printWttr(2, w - 1, wttrLines); // w - 2 でないのは改行文字分を含めるため
+        printWttr(2, w - 1, 2, 256, wttrLines); // w - 2 でないのは改行文字分を含めるため
 
         // 30分毎に天気取得コマンドを再実行して天気情報を更新する
-        // TODO: スレッド処理にして更新時のラグを無くす
         if (now % (60 * 30) == 0) {
-            getWttrLines(wttrCmd, wttrLines);
+            getWttrLines(wttrCmd, 2, 512, wttrLines);
         }
 
 
