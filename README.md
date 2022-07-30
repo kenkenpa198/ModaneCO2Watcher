@@ -38,7 +38,7 @@ Raspberry Pi OS (32-bit)
 ### 3.3. その他
 
 - LXTerminal 上で実行しています。
-- フォントは [HackGenNerd Console](https://github.com/yuru7/HackGen) を使用しています。
+- 画像のフォントは [HackGenNerd Console](https://github.com/yuru7/HackGen) を使用しています。
 
 ## 4. 環境構築
 
@@ -67,16 +67,21 @@ WTTR_LOCALE 環境変数は .bashrc などに記述して永続化しておい�
 - Raspberry Pi の環境でのみ、天気の初回取得後に表示がうまくできない事象が発生することがあります。
     - 次の取得時（30分毎）に正常に表示できるようになります。
 
-## 6. クレジット
+## 6. 使用ソフトウェア
 
-以下のソフトウェアやモジュールを利用させていただいております。
+- [Announcing ncurses 6.3](http://invisible-island.net/ncurses/)  
+Copyright © 1996-2021,2022 by Thomas E. Dickey  
+License : [https://invisible-island.net/ncurses/ncurses-license.html](https://invisible-island.net/ncurses/ncurses-license.html)
 
-- [Announcing ncurses 6.3](https://invisible-island.net/ncurses/announce.html)
-- [UedaTakeyuki/mh-z19](https://github.com/UedaTakeyuki/mh-z19)
-- [chubin/wttr.in](https://github.com/chubin/wttr.in)
-- [yuru7/HackGen](https://github.com/yuru7/HackGen)
+- [UedaTakeyuki/mh-z19](https://github.com/UedaTakeyuki/mh-z19)  
+Copyright (c) 2018 Dr. Takeyuki Ueda  
+License : [https://github.com/UedaTakeyuki/mh-z19/blob/master/LICENSE](https://github.com/UedaTakeyuki/mh-z19/blob/master/LICENSE)
 
-## 7. 参考サイト
+- [chubin/wttr.in](https://github.com/chubin/wttr.in)  
+Copyright {yyyy} {name of copyright owner}  
+License : [https://github.com/chubin/wttr.in/blob/master/LICENSE](https://github.com/chubin/wttr.in/blob/master/LICENSE)
+
+## 7. 参考文献
 
 ### 7.1. Raspberry Pi
 
