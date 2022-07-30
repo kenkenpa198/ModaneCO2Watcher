@@ -52,7 +52,7 @@ Raspberry Pi OS (32-bit)
 
 ```shell
 > git clone https://github.com/kenkenpa198/ModaneCO2Watcher.git # リポジトリのクローン
-> export WTTR_LOCALE="Tokyo"                                    # 天気表示用のロケール設定
+> export WTTR_LOCALE="Tokyo"                                    # 天気表示用のロケール設定 ※値は半角 159 文字以下で設定してください
 > sudo apt install libncurses5-dev                              # curses ライブラリのインストール
 > sudo pip3 install mh_z19                                      # mh_z19 モジュールのインストール
 > gcc ModaneCO2Watcher.c -lncursesw -o ModaneCO2Watcher.out     # コンパイル
@@ -74,7 +74,7 @@ WTTR_LOCALE 環境変数は .bashrc などに記述して永続化しておい�
 - [Announcing ncurses 6.3](https://invisible-island.net/ncurses/announce.html)
 - [UedaTakeyuki/mh-z19](https://github.com/UedaTakeyuki/mh-z19)
 - [chubin/wttr.in](https://github.com/chubin/wttr.in)
-- [yuru7/HackGen)](https://github.com/yuru7/HackGen)
+- [yuru7/HackGen](https://github.com/yuru7/HackGen)
 
 ## 7. 参考サイト
 
@@ -120,6 +120,7 @@ WTTR_LOCALE 環境変数は .bashrc などに記述して永続化しておい�
 - [【C言語】文字列を連結・結合する【strcatの危険性とsnprintfの安全性】 | MaryCore](https://marycore.jp/prog/c-lang/concat-c-string/#snprintf関数による文字列結合)
 - [【C言語】sprintf 関数と snprintf 関数（お手軽に文字列を生成する関数） | だえうホームページ](https://daeudaeu.com/c-sprintf/#sprintf-3)
 - [【C言語】malloc関数（メモリの動的確保）について分かりやすく解説 | だえうホームページ](https://daeudaeu.com/c_malloc/)
+- [C言語の引数に多次元配列を渡す - Qiita](https://qiita.com/Hiraku/items/babed27bc1d750c2e12d)
 
 ### 7.3. 天気情報の取得
 
