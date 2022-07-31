@@ -145,7 +145,7 @@ void makeWttrCmd(char wttrCmd[]) {
  * char wttrCmd[]               : 天気取得コマンド配列のポインタ
  * int size1                    : 天気情報を格納している二次元配列の1次元目配列の要素数
  * int size2                    : 天気情報を格納している二次元配列の2次元目配列の要素数
- * char wttrLines[size1][size2] : 天気情報を格納している二次元配列のポインタ
+ * char wttrLines[size1][size2] : 天気情報を格納している二次元配列のポインタと各要素数
  *
  * ▼戻り値
  * なし
@@ -611,7 +611,7 @@ int main(void) {
 
         // 30分毎に天気取得コマンドを再実行して天気情報を更新する
         if (now % (60 * 30) == 0) {
-            getWttrLines(wttrCmd, 2, 512, wttrLines);
+            getWttrLines(wttrCmd, 2, 256, wttrLines);
         }
 
 
