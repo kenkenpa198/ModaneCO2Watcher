@@ -246,7 +246,7 @@ void printWttr(int y, int x, int size1, int size2, char wttrLines[size1][size2])
 ***************************************/
 int printCo2GraphBase(int y, int x, int co2Style) {
 
-    char co2GraphBaseLines[][29] = {
+    char co2GraphBaseLines[][32] = {
         //                             XXXX ←この列に現在の ppm 数値が左詰めで入る
         "(ppm)                       ",
         "  900 |                     ",
@@ -287,68 +287,95 @@ int printCo2GraphBase(int y, int x, int co2Style) {
  * 描画用関数 : CO2グラフの折れ線グラフを描画する
  *
  * ▼引数
- * int y             : 描画を行う Y 座標
- * int x             : 描画を行う X 座標
- * int co2Conces[21] : CO2 濃度配列
+ * int y           : 描画を行う Y 座標
+ * int x           : 描画を行う X 座標
+ * int co2Conces[] : CO2 濃度の配列
  *
  * ▼戻り値
  * なし
  *
 ***************************************/
-void printCo2LineGraph(int y, int x, int co2Conces[21]) {
+void printCo2LineGraph(int y, int x, int co2Conces[]) {
     // 境界値配列の初期化
     // 下限値 + (上限値 / (行数 * 3)) * 繰り返し回数（i）で境界値を計算
     int co2BoundaryValue[18] = {0};
     for (int i = 0; i < 18; i++) {
         co2BoundaryValue[i] = 75 + 50 * (i + 1);
+        // mvprintw(1 + i   , 1, "%d", co2BoundaryValue[i]); // 確認用
     }
 
     // 折れ線グラフの描画
-    // TODO: もっと綺麗に書く
     for (int i = 0; i < 21; i++) {
+        // 0 以下の場合は表示しないので何もせずループをコンティニュー
         if (co2Conces[i] <= 0) {
-            mvaddstr(y    , x, " ");
-        } else if (co2Conces[i] <= co2BoundaryValue[0]) {
-            mvaddstr(y    , x, "_");
+            x++;
+            continue;
+        }
+
+        // 1000 以上であれば ! を6行目に描画してコンティニュー
+        if (co2Conces[i] >= 1000) {
+            mvaddstr(y - 6, x, "!");
+            x++;
+            continue;
+        }
+
+        // 1 ～ 999 の間の描画処理
+        // TODO: もう少し良い感じに書き換える
+
+        // 1行目の描画
+        if (co2Conces[i] <= co2BoundaryValue[0]) {
+            mvaddstr(y    , x, "_"); // 1行目の _ は 1 ～ 境界値配列の下限値を範囲に含む
         } else if (co2Conces[i] <= co2BoundaryValue[1]) {
             mvaddstr(y    , x, "-");
         } else if (co2Conces[i] <= co2BoundaryValue[2]) {
             mvaddstr(y    , x, "`");
+
+        // 2行目の描画
         } else if (co2Conces[i] <= co2BoundaryValue[3]) {
             mvaddstr(y - 1, x, "_");
         } else if (co2Conces[i] <= co2BoundaryValue[4]) {
             mvaddstr(y - 1, x, "-");
         } else if (co2Conces[i] <= co2BoundaryValue[5]) {
             mvaddstr(y - 1, x, "`");
+
+        // 3行目の描画
         } else if (co2Conces[i] <= co2BoundaryValue[6]) {
             mvaddstr(y - 2, x, "_");
         } else if (co2Conces[i] <= co2BoundaryValue[7]) {
             mvaddstr(y - 2, x, "-");
         } else if (co2Conces[i] <= co2BoundaryValue[8]) {
             mvaddstr(y - 2, x, "`");
+
+        // 4行目の描画
         } else if (co2Conces[i] <= co2BoundaryValue[9]) {
             mvaddstr(y - 3, x, "_");
         } else if (co2Conces[i] <= co2BoundaryValue[10]) {
             mvaddstr(y - 3, x, "-");
         } else if (co2Conces[i] <= co2BoundaryValue[11]) {
             mvaddstr(y - 3, x, "`");
+
+        // 5行目の描画
         } else if (co2Conces[i] <= co2BoundaryValue[12]) {
             mvaddstr(y - 4, x, "_");
         } else if (co2Conces[i] <= co2BoundaryValue[13]) {
             mvaddstr(y - 4, x, "-");
         } else if (co2Conces[i] <= co2BoundaryValue[14]) {
             mvaddstr(y - 4, x, "`");
+
+        // 6行目の描画
         } else if (co2Conces[i] <= co2BoundaryValue[15]) {
             mvaddstr(y - 5, x, "_");
         } else if (co2Conces[i] <= co2BoundaryValue[16]) {
             mvaddstr(y - 5, x, "-");
         } else if (co2Conces[i] <= co2BoundaryValue[17]) {
             mvaddstr(y - 5, x, "`");
+
+        // 7行目の描画
         } else {
-            mvaddstr(y - 6, x, "!");                      // 975 を超えていたら ! を描画
+            mvaddstr(y - 6, x, "_"); // 7行目の _ は 境界値配列の上限超過値 ～ 999 を範囲に含む
         }
         x++;
-        }
+    }
     return;
 }
 
@@ -450,7 +477,7 @@ void printModane(int y, int x, int eyeNum, int mouthNum) {
         mvaddstr(y++, x, modaneTopLines[i]);
     }
 
-    // 目の描画
+    // 目の描画（引数の値によって出し分け）
     if (eyeNum <= 11) {
         mvaddstr(y++, x, modaneEyeLines[0]); // Open
     } else if (eyeNum <= 19) {
@@ -459,7 +486,7 @@ void printModane(int y, int x, int eyeNum, int mouthNum) {
         mvaddstr(y++, x, modaneEyeLines[2]); // Gyu
     }
 
-    // 口の描画
+    // 口の描画（引数の値によって出し分け）
     if (mouthNum == 1) {
         mvaddstr(y++, x, modaneMouthLines[0]); // Open
     } else {
