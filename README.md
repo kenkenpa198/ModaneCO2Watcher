@@ -110,17 +110,21 @@ License : [https://github.com/chubin/wttr.in/blob/master/LICENSE](https://github
 - [C言語でシンプルすぎるブロック崩しを書いた - Qiita](https://qiita.com/pokohide/items/a246045f3ccaf540a375)
 - [文字列の長さの取得(C言語) - 超初心者向けプログラミング入門](https://programming.pc-note.net/c/mojiretsu2.html)
 
-#### 6.2.2. 配列操作など
+#### 6.2.2. 配列・メモリ操作
+
+- [配列を自由自在に作る - 苦しんで覚えるC言語](https://9cguide.appspot.com/19-01.html)
+- [【C言語】文字列を連結・結合する【strcatの危険性とsnprintfの安全性】 | MaryCore](https://marycore.jp/prog/c-lang/concat-c-string/#snprintf関数による文字列結合)
+- [【C言語】sprintf 関数と snprintf 関数（お手軽に文字列を生成する関数） | だえうホームページ](https://daeudaeu.com/c-sprintf/#sprintf-3)
+- [C言語の引数に多次元配列を渡す - Qiita](https://qiita.com/Hiraku/items/babed27bc1d750c2e12d)
+- [配列の要素数を求める | Programming Place Plus　Ｃ言語編　逆引き](https://programming-place.net/ppp/contents/c/rev_res/array000.html)
+- [【C言語】malloc関数（メモリの動的確保）について分かりやすく解説 | だえうホームページ](https://daeudaeu.com/c_malloc/)
+
+#### 6.2.3. その他
 
 - [C言語ケーススタディ　時計の作り方1](http://www.orchid.co.jp/computer/cschool/clock1.html)
 - [popenでコマンドの出力を読み込む - C言語入門](https://kaworu.jpn.org/c/popenでコマンドの出力を読み込む)
 - [C言語のソースからバックグラウンドでシェルを実行したい](https://teratail.com/questions/29960)
-- [配列を自由自在に作る - 苦しんで覚えるC言語](https://9cguide.appspot.com/19-01.html)
 - [C言語によるCSVファイルの読み込み方法 - なるぽのブログ](https://yu-nix.com/archives/c-read-csv/)
-- [【C言語】文字列を連結・結合する【strcatの危険性とsnprintfの安全性】 | MaryCore](https://marycore.jp/prog/c-lang/concat-c-string/#snprintf関数による文字列結合)
-- [【C言語】sprintf 関数と snprintf 関数（お手軽に文字列を生成する関数） | だえうホームページ](https://daeudaeu.com/c-sprintf/#sprintf-3)
-- [【C言語】malloc関数（メモリの動的確保）について分かりやすく解説 | だえうホームページ](https://daeudaeu.com/c_malloc/)
-- [C言語の引数に多次元配列を渡す - Qiita](https://qiita.com/Hiraku/items/babed27bc1d750c2e12d)
 - [ファイルの存在を確認する | Programming Place Plus　Ｃ言語編　逆引き](https://programming-place.net/ppp/contents/c/rev_res/file000.html)
 
 ### 6.3. 天気情報の取得
