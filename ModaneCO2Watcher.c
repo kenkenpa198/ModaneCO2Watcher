@@ -1,13 +1,52 @@
 #include <stdio.h>
 
-#include <locale.h>  // setlocale
-#include <stdlib.h>  // system, getenv, srand, rand, maclloc, exit
-#include <string.h>  // strlen
-#include <time.h>    // time, localtime, strftime
-#include <unistd.h>  // sleep, usleep
+#include <locale.h>   // setlocale
+#include <stdlib.h>   // system, getenv, srand, rand, maclloc, exit
+#include <string.h>   // strlen
+#include <sys/stat.h> // stat, mkdir
+#include <time.h>     // time, localtime, strftime
+#include <unistd.h>   // sleep, usleep
 
-#include <ncurses.h> // curses
+#include <ncurses.h>  // curses
 
+
+/***************************************
+ * ディレクトリが存在するか確認する関数
+ *
+ * ▼引数
+ * char dir[] : 確認するファイルパスのポインタ
+ *
+ * ▼戻り値
+ * 0          : 存在する
+ * 1          : 存在しない
+ *
+***************************************/
+int checkExistDir(char dir[]) {
+    struct stat st;
+    if (stat(dir, &st) != 0) {
+        return 0;
+    }
+    return 1;
+}
+
+/***************************************
+ * ファイルが存在するか確認する関数
+ *
+ * ▼引数
+ * char filepath[] : 確認するファイルパスのポインタ
+ *
+ * ▼戻り値
+ * 0               : 存在する
+ * 1               : 存在しない
+ *
+***************************************/
+int checkExistFile(char filepath[]) {
+    struct stat st;
+    if (stat(filepath, &st) != 0) {
+        return 0;
+    }
+    return 1;
+}
 
 /***************************************
  * CO2 濃度をログへ書き込む関数
@@ -16,13 +55,13 @@
  * Python ファイル内部で CO2 濃度を測定とログ用 CSV への書き込み処理を行う。
  *
  * python ファイルが存在しない、インポートエラーが起こった場合などが発生した場合は Python のエラーが画面に出力される。
- * 
+ *
  * ▼引数
  * なし
  *
  * ▼戻り値
  * なし
- * 
+ *
 ***************************************/
 void doRecordCo2ConceToLogs(void) {
     system("python3 record_co2_conce.py");
@@ -43,7 +82,9 @@ void doRecordCo2ConceToLogs(void) {
  * ファイルの展開に失敗した場合は 2 を返す。
  *
  * ▼引数
+ * char filepath[] : CO2 濃度ログファイルのパスのポインタ
  * int co2Conces[] : CO2 濃度を格納する配列のポインタ
+ * int len         : CO2 濃度を格納する配列の要素数
  * int getInterval : 取得する行数の間隔
  *
  * ▼戻り値
@@ -52,7 +93,7 @@ void doRecordCo2ConceToLogs(void) {
  * 2               : 異常終了（ファイルの展開に失敗）
  *
 ***************************************/
-int getCo2ConcesFromLogs(int co2Conces[], int getInterval) {
+int getCo2ConcesFromLogs(char filepath[] ,int co2Conces[], int len, int getInterval) {
 
     // 引数が指定外だった場合は 1 を返して終了
     if (getInterval <= 0) {
@@ -60,7 +101,6 @@ int getCo2ConcesFromLogs(int co2Conces[], int getInterval) {
     }
 
     // ログファイルの展開
-    char filepath[] = "./logs/co2_conces.csv";
     FILE* fp;
     fp = fopen(filepath, "r");
 
@@ -93,9 +133,14 @@ int getCo2ConcesFromLogs(int co2Conces[], int getInterval) {
     }
     fclose(fp);
 
+    // CO2 配列を 0 埋め
+    for (int i = 0; i < len; i++) {
+        co2Conces[i] = 0;
+    }
+
     // ヒープ配列の最終要素から指定行数毎に CO2 配列の最終要素から順に再代入する
     int c = lineCount - 1; // lineCount を添え字に合わせる
-    for (int i = 20; i >= 0 && c >= 0; i--) {
+    for (int i = len - 1; i >= 0 && c >= 0; i--) {
         co2Conces[i] = co2ConcesHeap[c];
         c -= getInterval;
     }
@@ -151,7 +196,7 @@ void makeWttrCmd(char wttrCmd[]) {
  * なし
  *
  * TODO: 天気の取得時にサーバーの応答待ちの分、表示が遅れてしまう。スレッド処理にしてラグを無くしたい。
- * 
+ *
 ***************************************/
 void getWttrLines(char wttrCmd[], int size1, int size2, char wttrLines[size1][size2]) {
     // 天気の格納用配列を宣言
@@ -290,12 +335,13 @@ int printCo2GraphBase(int y, int x, int co2Style) {
  * int y           : 描画を行う Y 座標
  * int x           : 描画を行う X 座標
  * int co2Conces[] : CO2 濃度の配列
+ * int len         : CO2 濃度配列の要素数
  *
  * ▼戻り値
  * なし
  *
 ***************************************/
-void printCo2LineGraph(int y, int x, int co2Conces[]) {
+void printCo2LineGraph(int y, int x, int co2Conces[], int len) {
     // 境界値配列の初期化
     // 下限値 + (上限値 / (行数 * 3)) * 繰り返し回数（i）で境界値を計算
     int co2BoundaryValue[18] = {0};
@@ -305,7 +351,7 @@ void printCo2LineGraph(int y, int x, int co2Conces[]) {
     }
 
     // 折れ線グラフの描画
-    for (int i = 0; i < 21; i++) {
+    for (int i = 0; i < len; i++) {
         // 0 以下の場合は表示しないので何もせずループをコンティニュー
         if (co2Conces[i] <= 0) {
             x++;
@@ -514,11 +560,36 @@ int main(void) {
     /***************************************
      * CO2 グラフの描画処理準備
     ***************************************/
-    printf("CO2 グラフの描画処理準備を開始します。\n");
+    printf("=== CO2 グラフの描画処理準備を開始 ===\n");
 
-    // 起動時の CO2 濃度を記録
-    // TODO: 実行を繰り返すとその分時間がズレてしまうので、ここではファイルを作成するのみにした方がよい
-    doRecordCo2ConceToLogs();
+    // CO2 濃度ログファイルのパスを定義
+    char co2ConcesDir[] = "./logs/";
+    char co2ConcesPath[] = "./logs/co2_conces.csv";
+
+    // CO2 濃度記録用のログファイルを作成
+    printf("CO2 濃度記録用のディレクトリとログファイルの存在確認を行います。\n");
+
+    if (checkExistDir(co2ConcesDir)) {
+        printf("ディレクトリが見つかりました。\n%s\n", co2ConcesDir);
+    } else {
+        printf("ディレクトリが見つかりませんでした。ディレクトリを作成します。\n%s\n", co2ConcesDir);
+        // ディレクトリを作成
+        if (mkdir(co2ConcesDir, 0755)) {
+            // エラーの場合はプログラムを終了する
+            perror("mkdir error.");
+            exit(0);
+        }
+    }
+
+    if (checkExistFile(co2ConcesPath)) {
+        printf("ファイルが見つかりました。\n%s\n", co2ConcesPath);
+    } else {
+        printf("ファイルが見つかりませんでした。ファイルを作成します。\n%s\n", co2ConcesPath);
+        // 空のファイルを作成
+        FILE* fp;
+        fp = fopen(co2ConcesPath, "w");
+        fclose(fp);
+    }
 
     // 取得行数の定数とグラフの表示形式を定義（初期値は NARROW とする）
     const int NARROW = 1; //  3 時間前まで（ログから1行毎に取得）
@@ -526,12 +597,19 @@ int main(void) {
     const int BROAD  = 6; // 20 時間前まで（ログから6行毎に取得）
     int co2Style = NARROW;
 
-    // CO2 濃度配列の初期化・ログファイルから過去の CO2 濃度を取得して配列へ格納
+    // CO2 濃度配列を初期化
     int co2Conces[21] = {0};
-    getCo2ConcesFromLogs(co2Conces, co2Style);
+
+    // CO2 濃度配列の要素数を取得
+    int co2ConcesLen = sizeof(co2Conces) / sizeof(co2Conces[0]);
+
+    // CO2 濃度配列の初期化・ログファイルから過去の CO2 濃度を取得して配列へ格納
+    printf("ファイルに記録されている CO2 濃度を取得します。\n");
+    getCo2ConcesFromLogs(co2ConcesPath, co2Conces, co2ConcesLen, co2Style);
 
     // 取得したCO2配列の確認
-    for (int i = 0; i < 21; i++) {
+    printf("取得した CO2 濃度の配列を表示します。\n");
+    for (int i = 0; i < co2ConcesLen; i++) {
         printf("co2Conces[%2d] : %4d\n", i, co2Conces[i]);
     }
     printf("\n");
@@ -541,7 +619,7 @@ int main(void) {
     /***************************************
      * 天気の描画処理準備
     ***************************************/
-    printf("天気の描画処理準備を開始します。\n");
+    printf("=== 天気の描画処理準備を開始 ===\n");
 
     // wttr コマンドの作成
     char wttrCmd[256];
@@ -557,7 +635,7 @@ int main(void) {
     /***************************************
      * もだねちゃんの描画処理準備
     ***************************************/
-    printf("もだねちゃんの描画処理準備を開始します。\n");
+    printf("=== もだねちゃんの描画処理準備を開始 ===\n");
 
     // 目と口を出し分けするための乱数用変数を初期化
     int eyeNum       = 1;
@@ -567,7 +645,7 @@ int main(void) {
     /***************************************
      * キー入力とステータスバーの描画処理準備
     ***************************************/
-    printf("キー入力とステータスバーの描画処理準備を開始します。\n");
+    printf("=== キー入力とステータスバーの描画処理準備を開始 ===\n");
 
     // 変数を初期化
     int StatusCount = 0; // ステータスバーの表示時間を管理する変数
@@ -578,7 +656,7 @@ int main(void) {
     /***************************************
      * 画面描画の準備
     ***************************************/
-    printf("画面描画の準備を開始します。\n");
+    printf("=== 画面描画の準備を開始 ===\n");
 
     time_t prev, now;            // 現在とループ前の時間
     int w, h;                    // 描画する画面の幅・高さ
@@ -648,17 +726,18 @@ int main(void) {
         // 10分毎にログへ書き込み & 配列の更新
         if (now % (60 * 10) == 0) {
             doRecordCo2ConceToLogs();
-            getCo2ConcesFromLogs(co2Conces, co2Style);
+            getCo2ConcesFromLogs(co2ConcesPath, co2Conces, co2ConcesLen, co2Style);
+
         }
 
         // グラフのベースを描画
         printCo2GraphBase(h - 10, w - 34, co2Style);
 
         // CO2 濃度配列を折れ線グラフで描画
-        printCo2LineGraph(h - 4, w - 27, co2Conces);
+        printCo2LineGraph(h - 4, w - 27, co2Conces, co2ConcesLen);
 
-        // CO2 濃度配列の現在の数値を描画
-        printCo2ValueNow(h - 4, w - 5, co2Conces[20]);
+        // CO2 濃度配列の現在の数値（配列の最後の要素）を描画
+        printCo2ValueNow(h - 4, w - 5, co2Conces[co2ConcesLen - 1]);
 
         // 1秒毎に現在のグラフ線部分にスペースを上書きして点滅させる
         doBlinkCo2Graph(h - 4, w - 6, now);
@@ -699,10 +778,10 @@ int main(void) {
 
             // A キーであれば CO2 グラフを 20時間前 までの表示へ切り替え
             case 'a':
-                StatusCount = 3;                           // ステータスバーの表示ループ数を設定
-                PushedKey = key;                           // ステータスバー表示用に押されたキーを保存
-                co2Style = BROAD;                          // CO2 表示の切り替え
-                getCo2ConcesFromLogs(co2Conces, co2Style); // CO2 配列の再取得
+                StatusCount = 3;  // ステータスバーの表示ループ数を設定
+                PushedKey = key;  // ステータスバー表示用に押されたキーを保存
+                co2Style = BROAD; // CO2 表示の切り替え
+                getCo2ConcesFromLogs(co2ConcesPath, co2Conces, co2ConcesLen, co2Style); // CO2 配列の再取得
                 break;
 
             // S キーであれば CO2 グラフを 10時間前 までの表示へ切り替え
@@ -710,7 +789,7 @@ int main(void) {
                 StatusCount = 3;
                 PushedKey = key;
                 co2Style = MEDIUM;
-                getCo2ConcesFromLogs(co2Conces, co2Style);
+                getCo2ConcesFromLogs(co2ConcesPath, co2Conces, co2ConcesLen, co2Style);
                 break;
 
             // D キーであれば CO2 グラフを 3時間前 までの表示へ切り替え
@@ -718,7 +797,7 @@ int main(void) {
                 StatusCount = 3;
                 PushedKey = key;
                 co2Style = NARROW;
-                getCo2ConcesFromLogs(co2Conces, co2Style);
+                getCo2ConcesFromLogs(co2ConcesPath, co2Conces, co2ConcesLen, co2Style);
                 break;
 
             // 他のキーであれば格納だけを行う
