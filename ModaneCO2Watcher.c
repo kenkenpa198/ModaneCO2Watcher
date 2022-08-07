@@ -78,36 +78,30 @@ void doRecordCo2ConceToLogs(void) {
  * 1 の場合は1行毎（10分毎）、6 の場合は6行毎（60分毎）という感じ。
  * 指定行数の間隔に沿って順に取得していき、取得先の行が存在しなくなったらその時点で取得を終了する。
  *
- * 引数2 の指定が 0 であれば 1 を返す。
- * ファイルの展開に失敗した場合は 2 を返す。
- *
  * ▼引数
  * char filepath[] : CO2 濃度ログファイルのパスのポインタ
  * int co2Conces[] : CO2 濃度を格納する配列のポインタ
  * int len         : CO2 濃度を格納する配列の要素数
- * int getInterval : 取得する行数の間隔
+ * int getInterval : 取得する行数の間隔（0 以上）
  *
  * ▼戻り値
- * 0               : 正常終了
- * 1               : 異常終了（引数エラー）
- * 2               : 異常終了（ファイルの展開に失敗）
+ * なし
  *
 ***************************************/
-int getCo2ConcesFromLogs(char filepath[] ,int co2Conces[], int len, int getInterval) {
+void getCo2ConcesFromLogs(char filepath[] ,int co2Conces[], int len, int getInterval) {
 
-    // 引数が指定外だった場合は 1 を返して終了
+    // 引数が指定外だった場合はプログラムを異常終了
     if (getInterval <= 0) {
-        return 1;
+        exit(1);
     }
 
     // ログファイルの展開
     FILE* fp;
     fp = fopen(filepath, "r");
 
-    // ファイルの展開に失敗したら 2 を返して終了
-    if (!fp) {
-        fclose(fp);
-        return 2;
+    // ファイルの展開に失敗したらプログラムを異常終了
+    if (fp == NULL) {
+        exit(1);
     }
 
     // 取得用変数・配列の宣言
@@ -122,7 +116,7 @@ int getCo2ConcesFromLogs(char filepath[] ,int co2Conces[], int len, int getInter
     co2ConcesHeap = (int*)malloc(sizeof(int) * 100000); // 1.5年分くらい
     if (co2ConcesHeap == NULL) {
         // ヒープが確保できなかったらプログラムを強制終了する
-        exit(0);
+        exit(1);
     }
 
     // 行数を数えつつ CO2 濃度をヒープ配列へ代入
@@ -146,7 +140,7 @@ int getCo2ConcesFromLogs(char filepath[] ,int co2Conces[], int len, int getInter
     }
     free(co2ConcesHeap); // ヒープの解放
 
-    return 0;
+    return;
 }
 
 /***************************************
@@ -650,7 +644,6 @@ int main(void) {
     // 変数を初期化
     int StatusCount = 0; // ステータスバーの表示時間を管理する変数
     int PushedKey;       // 押されたキーを保持しておく変数
-    int PrevKey;         // 前回押されたキーを保持しておく変数
 
 
     /***************************************
@@ -660,7 +653,6 @@ int main(void) {
 
     time_t prev, now;            // 現在とループ前の時間
     int w, h;                    // 描画する画面の幅・高さ
-    int x, y;                    // mvaddstr() などで指定する縦横軸の座標
     int	key;                     // 送信されたキー入力の番号を格納する変数。getch() の戻り値は int のため int 型で宣言
     srand((unsigned)time(NULL)); // 乱数用のシードを設定
     setlocale(LC_CTYPE, "");     // 2バイト文字を扱えるようにする
