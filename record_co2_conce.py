@@ -3,20 +3,21 @@ from datetime import datetime as dt
 import os
 import mh_z19
 
-'''
-■ CO2 濃度を検証する関数
-メインプログラム側のメモリサイズ超過などの対策用。
 
-▼引数
-int co2_conce : 検証する CO2 濃度
-
-▼戻り値
-int 0         : 正常値である
-int 1         : 4桁を超える異常値
-int 2         : マイナスである異常値
-
-'''
 def verify_co2_conce(co2_conce: int) -> int:
+    """
+    ■ CO2 濃度を検証する関数
+    メインプログラム側のメモリサイズ超過などの対策用。
+
+    Args:
+        co2_conce (int): 検証する CO2 濃度
+
+    Returns:
+        int: 正常終了または異常終了を識別する数値。以下いずれかの値が出力される。
+            - 0 ... 正常値である
+            - 1 ... 4桁を超える異常値
+            - 2 ... マイナス値である異常値
+    """
     if co2_conce > 9999:
         return 1
     if co2_conce < 0:
@@ -24,10 +25,9 @@ def verify_co2_conce(co2_conce: int) -> int:
     return 0
 
 
-'''
+"""
 ■ メイン処理
-
-'''
+"""
 # 現在日時を取得（YYYY-MM-DD hh:mm:ss）
 now = dt.now().strftime('%Y-%m-%d %H:%M:%S')
 
