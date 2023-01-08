@@ -113,7 +113,7 @@ void getCo2ConcesFromLogs(char filepath[] ,int co2Conces[], int len, int getInte
 
     // ヒープを確保
     int* co2ConcesHeap;
-    co2ConcesHeap = (int*)malloc(sizeof(int) * 100000); // 1.5年分くらい
+    co2ConcesHeap = (int*)malloc(sizeof(int) * 8000); // int 型配列（4バイト） × 4909 要素分以上の確保が必要。record_co2_conce > log_conce() のコメントを参照
     if (co2ConcesHeap == NULL) {
         // ヒープが確保できなかったらプログラムを強制終了する
         exit(1);
