@@ -99,7 +99,6 @@ Copyright (c) 2018 Dr. Takeyuki Ueda
 License : [https://github.com/UedaTakeyuki/mh-z19/blob/master/LICENSE](https://github.com/UedaTakeyuki/mh-z19/blob/master/LICENSE)
 
 - [chubin/wttr.in](https://github.com/chubin/wttr.in)  
-Copyright {yyyy} {name of copyright owner} ※コピーライトがテンプレートのままでした😅  
 License : [https://github.com/chubin/wttr.in/blob/master/LICENSE](https://github.com/chubin/wttr.in/blob/master/LICENSE)
 
 ## 7. 参考文献
