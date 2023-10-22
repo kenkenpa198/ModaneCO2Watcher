@@ -84,11 +84,7 @@ $ ./ModaneCO2Watcher.out
 `WTTR_LOCALE` 環境変数は `.bashrc` などに記述して永続化しておくとよいです。  
 お好みでシェルのフォントサイズの調整や autostart 等の設定も。
 
-## 5. ライセンス
-
-[MIT License](LICENSE)
-
-## 6. 使用ソフトウェア
+## 5. 使用ソフトウェア
 
 - [Announcing ncurses 6.3](http://invisible-island.net/ncurses/)  
 Copyright © 1996-2021,2022 by Thomas E. Dickey  
@@ -101,17 +97,17 @@ License : [https://github.com/UedaTakeyuki/mh-z19/blob/master/LICENSE](https://g
 - [chubin/wttr.in](https://github.com/chubin/wttr.in)  
 License : [https://github.com/chubin/wttr.in/blob/master/LICENSE](https://github.com/chubin/wttr.in/blob/master/LICENSE)
 
-## 7. 参考文献
+## 6. 参考文献
 
-### 7.1. Raspberry Pi
+### 6.1. Raspberry Pi
 
-#### 7.1.1. セットアップ
+#### 6.1.1. セットアップ
 
 - [ラズパイで遊ぼう！ - YouTube](https://www.youtube.com/playlist?list=PLZv220voQQ_OYkVoim13CA91R_iLospsR)
 - [Raspberry Pi4で使えるタッチパネル付き5インチディスプレイを買ってみた！ – すいラボ](https://sui-lab.info/archives/3222)
 - [【ラズパイ】Raspberry Piをディスプレイなしでセットアップする - 車輪日記](https://bowmiow.net/garage/raspi-first/#toc12)
 
-#### 7.1.2. 設定
+#### 6.1.2. 設定
 
 - [ラズベリーパイでフォントを簡単に追加削除する | けいきゅん ヽ(^◇^*)/♪ でおじゃる](https://ameblo.jp/anima-ameblo/entry-12398046009.html)
 - [ラズパイを起動したら、ターミナル開いてシェルを実行する方法 - Qiita](https://qiita.com/tonosamart/items/f59daa481f90c85a8a99)
@@ -120,14 +116,14 @@ License : [https://github.com/chubin/wttr.in/blob/master/LICENSE](https://github
 - [Raspberry Piの起動時にターミナルが立ち上がり、「Hello world」と表示される機能を実装しようと思いましたが上手くいきません.](https://teratail.com/questions/334030)
 - [RasiPiでブラウザを自動起動してキオスク端末にする方法 | 映像とその周辺](https://www.kalium.net/image/2021/03/11/rasipiでブラウザを自動起動してキオスク端末にする/)
 
-#### 7.1.3. CO2 濃度の測定
+#### 6.1.3. CO2 濃度の測定
 
 - [Raspberry Pi 4とMH-Z19Bで二酸化炭素濃度を計測してみた | DevelopersIO](https://dev.classmethod.jp/articles/raspberry-pi-4-b-mh-z19b-co2/)
 - [【Python】Raspberry Pi + mh-z19でCO2濃度取得してみた - BFT名古屋 TECH BLOG](https://bftnagoya.hateblo.jp/entry/2021/08/25/120844)
 
-### 7.2. C 言語
+### 6.2. C 言語
 
-#### 7.2.1. 画面描画
+#### 6.2.1. 画面描画
 
 - [curses による端末制御](https://www.kushiro-ct.ac.jp/yanagawa/ex-2017/2-game/01.html)
 - [cursesライブラリの超てきとー解説](https://www.kushiro-ct.ac.jp/yanagawa/pl2b-2018/curses/about.html)
@@ -135,7 +131,7 @@ License : [https://github.com/chubin/wttr.in/blob/master/LICENSE](https://github
 - [C言語でシンプルすぎるブロック崩しを書いた - Qiita](https://qiita.com/pokohide/items/a246045f3ccaf540a375)
 - [文字列の長さの取得(C言語) - 超初心者向けプログラミング入門](https://programming.pc-note.net/c/mojiretsu2.html)
 
-#### 7.2.2. 配列・メモリ操作
+#### 6.2.2. 配列・メモリ操作
 
 - [【C言語】文字列を連結・結合する【strcatの危険性とsnprintfの安全性】 | MaryCore](https://marycore.jp/prog/c-lang/concat-c-string/#snprintf関数による文字列結合)
 - [【C言語】sprintf 関数と snprintf 関数（お手軽に文字列を生成する関数） | だえうホームページ](https://daeudaeu.com/c-sprintf/#sprintf-3)
@@ -144,7 +140,7 @@ License : [https://github.com/chubin/wttr.in/blob/master/LICENSE](https://github
 - [C言語の引数に多次元配列を渡す - Qiita](https://qiita.com/Hiraku/items/babed27bc1d750c2e12d)
 - [配列の要素数を求める | Programming Place Plus　Ｃ言語編　逆引き](https://programming-place.net/ppp/contents/c/rev_res/array000.html)
 
-#### 7.2.3. その他
+#### 6.2.3. その他
 
 - [C言語ケーススタディ　時計の作り方1](http://www.orchid.co.jp/computer/cschool/clock1.html)
 - [popenでコマンドの出力を読み込む - C言語入門](https://kaworu.jpn.org/c/popenでコマンドの出力を読み込む)
@@ -152,17 +148,17 @@ License : [https://github.com/chubin/wttr.in/blob/master/LICENSE](https://github
 - [C言語によるCSVファイルの読み込み方法 - なるぽのブログ](https://yu-nix.com/archives/c-read-csv/)
 - [ファイルの存在を確認する | Programming Place Plus　Ｃ言語編　逆引き](https://programming-place.net/ppp/contents/c/rev_res/file000.html)
 
-### 7.3. ログローテーション
+### 6.3. ログローテーション
 
 - [[Python] ログのファイル出力とログローテーション | HIROs.NET Blog](https://blog.hiros-dot.net/?p=10297)
 - [Raspberry Piで記録する温度、湿度などのログをローテーションする - Qiita](https://qiita.com/mashi0727/items/d19186759c52cbba60e9)
 
-### 7.4. 天気情報の取得
+### 6.4. 天気情報の取得
 
 - [curl で wttr.in に問い合わせて ターミナル上で天気予報を確認する - ブログ](https://gouf.hatenablog.com/entry/2018/06/29/174028)
 - [天気を呟くbot｜シェルスクリプトで作る Twitter bot 作成入門](https://zenn.dev/mattn/books/bb181f3f4731920f29a5/viewer/cc50c48272963c206d34)
 
-### 7.5. アスキーアート
+### 6.5. アスキーアート
 
 - [PythonとOpenCVで画像をアスキーアート化してみる（トレースAAへの道） | ねほり.com](https://nehori.com/nikki/2021/04/04/post-27881/)
 - [アスキーアート - Wikipedia](https://ja.wikipedia.org/wiki/%E3%82%A2%E3%82%B9%E3%82%AD%E3%83%BC%E3%82%A2%E3%83%BC%E3%83%88)
